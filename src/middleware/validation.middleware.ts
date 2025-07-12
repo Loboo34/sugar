@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { Request, Response, NextFunction } from 'express';
+import { create } from 'domain';
 
 export const validate = (schema: Joi.ObjectSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -31,5 +32,37 @@ export const schemas = {
         image: Joi.string().optional(),
         category: Joi.string().optional(),
         stock: Joi.number().min(0).optional()
+    }),
+    makeOrder: Joi.object({
+        user: Joi.string().optional(),
+        products: Joi.array().items(
+            Joi.object({
+                product: Joi.string().required(),
+                quantity: Joi.number().min(1).required()
+            })
+        ),
+        totalAmount: Joi.number().min(0).required(),
+        paymentMethod: Joi.string().valid("cash", "Mpesa").required()    
+    }),
+    updateOrder: Joi.object({
+        user: Joi.string().optional(),
+        products: Joi.array().items(
+            Joi.object({
+                product: Joi.string().required(),
+                quantity: Joi.number().min(1).required()
+            })
+        ).optional(),
+        totalAmount: Joi.number().min(0).optional(),
+        paymentMethod: Joi.string().valid("cash", "Mpesa").optional()
+    }),
+    createStoreItem: Joi.object({
+        ItemName: Joi.string().min(1).max(100).required(),
+        quantity: Joi.number().min(1).required(),
+        quantityType: Joi.string().valid("kg", "g", "liters", "units").required()
+    }),
+        updateStoreItem: Joi.object({
+        ItemName: Joi.string().min(1).max(100).optional(),
+        quantity: Joi.number().min(1).optional(),
+        quantityType: Joi.string().valid("kg", "g", "liters", "units").optional()
     })
 }
