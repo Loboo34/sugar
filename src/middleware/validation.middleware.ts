@@ -64,5 +64,9 @@ export const schemas = {
         ItemName: Joi.string().min(1).max(100).optional(),
         quantity: Joi.number().min(1).optional(),
         quantityType: Joi.string().valid("kg", "g", "liters", "units").optional()
+    }),
+    transferStoreItem: Joi.object({
+        quantity: Joi.number().min(1).required(),
+        //destination: Joi.string().required()
     })
 }

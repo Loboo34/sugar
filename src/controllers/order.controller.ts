@@ -51,22 +51,6 @@ export const createOrder = async (req: Request, res: Response) => {
   const { user, products, totalAmount, paymentMethod } = req.body;
   logger.info("Creating order with data:", { reqBody: req.body });
   try {
-    const newOrder = new Order({
-      user,
-      products,
-      totalAmount,
-      paymentMethod,
-    });
-
-    const savedOrder = await newOrder.save();
-    logger.info("Order created successfully:", savedOrder);
-    if (!savedOrder) {
-      logger.error("Failed to save order");
-      return res.status(500).json({
-        success: false,
-        message: "Failed to create order",
-      });
-    }
     if (!products || products.length === 0) {
         logger.warn("No products provided in order");
         return res.status(400).json({
@@ -88,15 +72,52 @@ export const createOrder = async (req: Request, res: Response) => {
             message: "Invalid payment method",
         });
     }
+
+    // Check stock availability 
+    for (const item of products) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        logger.warn(`Product with ID ${item.product} not found`);
+        return res.status(400).json({
+            success: false,
+            message: `Product with ID ${item.product} not found`,
+        });
+      }
+      if (item.quantity > product.stock) {
+        logger.warn("Insufficient stock for product");
+        return res.status(400).json({
+            success: false,
+            message: "Insufficient stock for product",
+        });
+      }
+    }
+
+    const newOrder = new Order({
+      user,
+      products,
+      totalAmount,
+      paymentMethod,
+    });
+
+    const savedOrder = await newOrder.save();
+    logger.info("Order created successfully:", savedOrder);
+    if (!savedOrder) {
+      logger.error("Failed to save order");
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create order",
+      });
+    }
+
+    // Update stock 
     for (const item of products) {
       const product = await Product.findById(item.product);
       if (product) {
         product.stock -= item.quantity;
         await product.save();
-      } else {
-        logger.warn(`Product with ID ${item.product} not found`);
       }
     }
+
     res.status(201).json({
       success: true,
       data: savedOrder,

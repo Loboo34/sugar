@@ -113,3 +113,43 @@ export const deleteStoreItem = async (req: Request, res: Response) => {
   }
 };
 
+//transfer item from store to kitchen
+export const transferStoreItem = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+  logger.info(`Transferring ${quantity} of store item with ID: ${id} to kitchen`);
+  try {
+    const item = await Store.findById(id);
+    if (!item) {
+      logger.error(`Store item with ID ${id} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "Store item not found",
+      });
+    }
+
+    if (item.quantity < quantity) {
+      logger.warn(`Insufficient quantity for transfer. Available: ${item.quantity}, Requested: ${quantity}`);
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient quantity for transfer",
+      });
+    }
+
+    item.quantity -= quantity;
+    await item.save();
+
+    logger.info(`Transferred ${quantity} of store item with ID ${id} to kitchen successfully`);
+    res.status(200).json({
+      success: true,
+      message: `Transferred ${quantity} of store item to kitchen successfully`,
+      data: item,
+    });
+  } catch (error: any) {
+    logger.error(`Error transferring store item to kitchen: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
