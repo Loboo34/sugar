@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Store from "../models/store.model";
-import logger from "../config/logger";
+import{ logger} from "../config/logger";
 
 export const createStoreItem = async (req: Request, res: Response) => {
   const { ItemName, quantity, quantityType } = req.body;

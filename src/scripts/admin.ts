@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import Auth from "../models/auth.model";
-import logger from "../config/logger";
+import{ logger} from "../config/logger";
 
 async function createAdmin() {
   try {

@@ -1,5 +1,5 @@
 import winston from "winston";
-//import morgan from "morgan";
+import morgan from "morgan";
 
 const logger = winston.createLogger({
     level: "info",
@@ -16,6 +16,12 @@ const logger = winston.createLogger({
     ]
 });
 
+const httpLogger = morgan("combined", {
+    stream: {
+        write: (message) => {
+            logger.info(message.trim());
+        }
+    }
+});
 
-
-export default logger;
+export { logger, httpLogger };

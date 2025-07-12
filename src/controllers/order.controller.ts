@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Order from "../models/order.model";
 import Product from "../models/product.model";
-import logger from "../config/logger";
+import {logger} from "../config/logger";
 
 export const getAllOrders = async (req: Request, res: Response) => {
   try {

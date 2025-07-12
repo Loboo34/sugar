@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import Order from '../models/order.model';
 import Store from '../models/store.model';
-import logger from '../config/logger';
+import {logger} from '../config/logger';
 
 export const getTotalSales = async (req: Request, res: Response) => {
     try {

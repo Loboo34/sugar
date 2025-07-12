@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import bcrypt from 'bcryptjs';
 import Auth from '../models/auth.model';
-import logger from '../config/logger';
+import {logger} from '../config/logger';
 import { generateToken } from '../utils/jwt';
 
 // Extend the Request interface to include user property
@@ -54,7 +54,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
         const token = generateToken({ id: user._id, email: user.email });
-        return res.status(200).json({ token });
+        return res.status(200).json({ token, user });
     } catch (error) {
         logger.error('Error logging in user', error);
         return res.status(500).json({ message: 'Internal server error' });

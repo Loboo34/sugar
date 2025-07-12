@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import Product from "../models/product.model";
-import logger from '../config/logger';
+import {logger} from '../config/logger';
 
 
 export const getProducts = async (res: Response, req: Request) => {

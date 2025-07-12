@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import createAdmin from "./scripts/admin";
 import connectDB from "./config/db";
-import logger from "./config/logger";
+import { logger, httpLogger } from "./config/logger";
 
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
@@ -16,7 +16,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-createAdmin();
+app.use(httpLogger);
+
+//createAdmin();
 
 const apiVersion = `/api/${process.env.API_VERSION}`;
 
