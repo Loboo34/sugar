@@ -68,5 +68,20 @@ export const schemas = {
     transferStoreItem: Joi.object({
         quantity: Joi.number().min(1).required(),
         //destination: Joi.string().required()
-    })
+    }),
+    register: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).required(),
+        name: Joi.string().min(2).max(100).required(),
+        role: Joi.string().valid('attendant', 'admin').default('attendant')
+    }),
+    login: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(6).required()
+    }),
+    updateProfile: Joi.object({
+        name: Joi.string().min(2).max(100).optional(),
+        email: Joi.string().email().optional(),
+        password: Joi.string().min(6).optional()
+    }),
 }
