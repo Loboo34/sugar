@@ -3,7 +3,7 @@ import Product from "../models/product.model";
 import {logger} from '../config/logger';
 
 
-export const getProducts = async (res: Response, req: Request) => {
+export const getProducts = async (req: Request, res: Response) => {
     try {
         const products = await Product.find();
         res.status(200).json(products);

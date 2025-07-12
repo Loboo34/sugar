@@ -61,7 +61,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     }
 };
 export const getUserProfile = async (req: Request, res: Response): Promise<Response> => {
-    const userId = req.user?.id; // Assuming user ID is set in req.user by authentication middleware
+    const userId = req.user?.id; 
 
     try {
         const user = await Auth.findById(userId).select('-password'); // Exclude password from response
