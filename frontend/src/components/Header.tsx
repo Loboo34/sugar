@@ -1,6 +1,6 @@
 import React from "react";
 import { LogOut, User, ShoppingBag } from "lucide-react";
-import { Button } from "./button";
+import { Button } from "./Button";
 
 const Header = () => {
     const itemCount = 0; // Replace with actual item count from state or props
@@ -15,8 +15,8 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <ShoppingBag className="h-8 w-8 text-amber-600 mr-3" />
-            <h1 className="text-2xl font-bold text-amber-800">Golden Crust Bakery</h1>
+            <ShoppingBag className="h-8 w-8 text-yellow-600 mr-3" />
+            <h1 className="text-2xl font-bold text-amber-900">Golden Crust Bakery</h1>
           </div>
 
           {/* User info and actions */}

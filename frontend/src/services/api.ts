@@ -9,6 +9,17 @@ export const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const authStorage = localStorage.getItem("auth-storage");
+  if (authStorage) {
+    const { state } = JSON.parse(authStorage);
+    if (state.token) {
+      config.headers.Authorization = `Bearer ${state.token}`;
+    }
+  }
+  return config;
+});
+
 //authentication service
 export const registerUser = async (userData: User) => {
   try {
