@@ -4,7 +4,7 @@ import { cn} from "../utils/cn";
 
 
 const Navigation = () => {
-    const user = { role: 'admin' }; // Example user object, replace with actual user state
+    const user = { role: 'admin' }; 
   
 
   const navItems = [
@@ -21,7 +21,7 @@ const Navigation = () => {
       roles: ['admin', 'cashier']
     },
     {
-      to: '/admin',
+      to: '/management',
       icon: Settings,
       label: 'Admin',
       roles: ['admin']
