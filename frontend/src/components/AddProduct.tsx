@@ -18,7 +18,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
     price: "",
     image: "",
     category: "",
-    stock: true,
+    stock: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -33,7 +33,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
     "Other",
   ];
 
-  //  animation on mount
   useEffect(() => {
     setIsVisible(true);
   }, []);
@@ -59,6 +58,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
 
     if (!formData.image.trim()) {
       newErrors.image = "Image URL is required";
+    }
+
+    if (formData.stock < 0) {
+      newErrors.stock = "Stock must be a positive number";
     }
 
     setErrors(newErrors);
@@ -91,7 +94,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
 
   const handleClose = () => {
     setIsVisible(false);
-   
     setTimeout(() => {
       onClose();
     }, 300);
@@ -110,7 +112,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
         type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
 
-  
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -131,7 +132,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto transition-all duration-300 ease-out transform ${
+        className={`bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-all duration-300 ease-out transform ${
           isVisible
             ? "translate-y-0 opacity-100 scale-100"
             : "translate-y-4 opacity-0 scale-95"
@@ -153,9 +154,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="transform transition-all duration-200 hover:scale-[1.02]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+        <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          {/* Product Name */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
               Product Name *
             </label>
             <input
@@ -163,94 +165,113 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
-                errors.name ? "border-red-500 shake" : "border-gray-300"
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
+                errors.name
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-200 hover:border-gray-300"
               }`}
               placeholder="Enter product name"
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600 animate-pulse">
+              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                <span className="text-red-500">⚠</span>
                 {errors.name}
               </p>
             )}
           </div>
 
-         
-          <div className="transform transition-all duration-200 hover:scale-[1.02]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          {/* Description */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
               Description *
             </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              rows={3}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
-                errors.description ? "border-red-500" : "border-gray-300"
+              rows={2}
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
+                errors.description
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-200 hover:border-gray-300"
               }`}
               placeholder="Enter product description"
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-600 animate-pulse">
+              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                <span className="text-red-500">⚠</span>
                 {errors.description}
               </p>
             )}
           </div>
 
-         
-          <div className="transform transition-all duration-200 hover:scale-[1.02]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Price (KSH) *
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
-                errors.price ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="0.00"
-            />
-            {errors.price && (
-              <p className="mt-1 text-sm text-red-600 animate-pulse">
-                {errors.price}
-              </p>
-            )}
+          {/* Price and Category - Flex Layout */}
+          <div className="flex gap-4">
+            {/* Improved Price Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-800">
+                Price (KSH) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                  KSH
+                </span>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
+                    errors.price
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  placeholder="0.00"
+                />
+              </div>
+              {errors.price && (
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <span className="text-red-500">⚠</span>
+                  {errors.price}
+                </p>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-2">
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Category *
+              </label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
+                  errors.category
+                    ? "border-red-500 bg-red-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              {errors.category && (
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <span className="text-red-500">⚠</span>
+                  {errors.category}
+                </p>
+              )}
+            </div>
           </div>
 
-    
-          <div className="transform transition-all duration-200 hover:scale-[1.02]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
-            </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
-                errors.category ? "border-red-500" : "border-gray-300"
-              }`}
-            >
-              <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-            {errors.category && (
-              <p className="mt-1 text-sm text-red-600 animate-pulse">
-                {errors.category}
-              </p>
-            )}
-          </div>
-
-     
-          <div className="transform transition-all duration-200 hover:scale-[1.02]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          {/* Image URL */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
               Image URL *
             </label>
             <input
@@ -258,19 +279,22 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
               name="image"
               value={formData.image}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 ${
-                errors.image ? "border-red-500" : "border-gray-300"
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
+                errors.image
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-200 hover:border-gray-300"
               }`}
               placeholder="https://example.com/image.jpg"
             />
             {errors.image && (
-              <p className="mt-1 text-sm text-red-600 animate-pulse">
+              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                <span className="text-red-500">⚠</span>
                 {errors.image}
               </p>
             )}
           </div>
 
-        
+          {/* Image Preview */}
           {formData.image && (
             <div className="transform transition-all duration-300 ease-out animate-fadeIn">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -280,7 +304,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
                 <img
                   src={formData.image}
                   alt="Product preview"
-                  className="w-24 h-24 object-cover rounded-lg mx-auto transition-all duration-300 hover:scale-110"
+                  className="w-32 h-32 object-cover rounded-lg mx-auto transition-all duration-300 hover:scale-110"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
@@ -289,36 +313,75 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
             </div>
           )}
 
-      
-          <div className="flex items-center transform transition-all duration-200 hover:scale-[1.02]">
-            <input
-              type="checkbox"
-              name="stock"
-              checked={formData.stock}
-              onChange={handleChange}
-              className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded transition-all duration-200"
-            />
-            <label className="ml-2 text-sm text-gray-700">
-              Available in stock
-            </label>
+          {/* In Stock */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Enhanced Stock Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-800">
+                Stock Quantity *
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  name="stock"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  min="0"
+                  step="1"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
+                    errors.stock
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  placeholder="0"
+                />
+                <Package className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              </div>
+              {errors.stock && (
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <span className="text-red-500">⚠</span>
+                  {errors.stock}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-800">
+                Status
+              </label>
+              <div className="flex items-center h-12 px-4 py-3 bg-gray-50 rounded-xl border-2 border-gray-200">
+                <div
+                  className={`w-3 h-3 rounded-full mr-3 ${
+                    formData.stock > 0 ? "bg-green-500" : "bg-red-500"
+                  }`}
+                ></div>
+                <span
+                  className={`text-sm font-medium ${
+                    formData.stock > 0 ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  {formData.stock > 0 ? "In Stock" : "Out of Stock"}
+                </span>
+              </div>
+            </div>
           </div>
 
-       
-          <div className="flex gap-3 pt-4">
+          {/* Improved Buttons */}
+          <div className="flex gap-4 pt-8 border-t border-gray-200">
             <Button
               type="button"
               variant="secondary"
               onClick={handleClose}
-              className="flex-1 transform transition-all duration-200 hover:scale-105"
+              className="flex-1 py-3 text-base font-medium"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               loading={isLoading}
-              className="flex-1 transform transition-all duration-200 hover:scale-105"
+              className="flex-1 py-3 text-base font-medium bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
             >
-              Add Product
+              {isLoading ? "Adding Product..." : "Add Product"}
             </Button>
           </div>
         </form>

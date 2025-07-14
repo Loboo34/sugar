@@ -5,7 +5,7 @@ export interface Product {
     price: number;
     image: string;
     category: string;
-    stock: boolean;
+    stock: number;
 }
 
 export interface Item {
