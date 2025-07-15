@@ -10,10 +10,9 @@ export interface Product {
 
 export interface Item {
     id: string;
-    name: string;
+    itemName: string;
     quantity: number;
     unit: string;
-    stock: number;
 }
 
 export interface Order {

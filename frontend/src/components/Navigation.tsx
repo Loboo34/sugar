@@ -38,7 +38,7 @@ const Navigation = () => {
     );
 
     return (
-      <nav className="bg-stone-50 border-r border-amber-300 w-64 min-h-screen">
+      <nav className="bg-white border-r border-amber-300 w-64 min-h-screen">
         <div className="p-4">
           <ul className="space-y-2">
             {filteredItems.map((item) => {

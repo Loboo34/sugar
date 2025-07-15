@@ -13,13 +13,10 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
     const [isVisible, setIsVisible] = useState(true);
       const [errors, setErrors] = useState<Record<string, string>>({});
     const [formData, setFormData] = useState({
-        name: '',
-      //  description: '',
+        itemName: '',  
         quantity: 1,
-        //price: 0,
-      //  image: "",
         unit: '' ,// Default unit
-        stock: 0, // Default stock quantity
+     
     });
 
 
@@ -30,7 +27,7 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
-        if (!formData.name) newErrors.name = "Item name is required.";
+        if (!formData.itemName) newErrors.itemName = "Item name is required.";
         if (formData.quantity <= 0) newErrors.quantity = "Quantity must be greater than zero.";
         if (!formData.unit) newErrors.unit = "Unit is required.";
         if (Object.keys(newErrors).length > 0) {
@@ -48,13 +45,13 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
         try {
             await addItem(formData as Item);
             setFormData({
-                name: '',
+                itemName: '',
                 quantity: 1,
                 unit: '',
-                stock: 0,
+               
             });
             setErrors({});
-            //setIsVisible(false);
+           handleClose();
         } catch (error) {
             console.error("Error adding item:", error);
         }
@@ -121,17 +118,17 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="itemName"
+                value={formData.itemName}
                 onChange={handleChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
-                  errors.name
+                  errors.itemName
                     ? "border-red-500 bg-red-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
-                placeholder="Enter product name"
+                placeholder="Enter item name"
               />
-              {errors.name && (
+              {errors.itemName && (
                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                   <span className="text-red-500">⚠</span>
                   {errors.name}
@@ -169,8 +166,8 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
                     <label className="block text-sm font-semibold text-gray-800 mb-2">
                         Unit *
                     </label>
-                    <input
-                        type="text"
+                    <select
+                     
                         name="unit"
                         value={formData.unit}
                         onChange={handleChange}
@@ -179,8 +176,15 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
                                 ? "border-red-500 bg-red-50"
                                 : "border-gray-200 hover:border-gray-300"
                         }`}
-                        placeholder="Enter unit"
-                    />
+                      
+                    >
+                        <option value="" disabled>Select unit</option>
+                        {units.map((unit) => (
+                            <option key={unit} value={unit}>
+                                {unit}
+                            </option>
+                        ))}
+                    </select>
                     {errors.unit && (
                         <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                             <span className="text-red-500">⚠</span>
@@ -191,59 +195,7 @@ const AddItem: React.FC<AddItemProps> = ({ onClose }) => {
             </div>
 
 
-            {/* In Stock */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Enhanced Stock Input */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Stock Quantity *
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleChange}
-                    min="0"
-                    step="1"
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
-                      errors.stock
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    placeholder="0"
-                  />
-                  <Package className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                </div>
-                {errors.stock && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                    <span className="text-red-500">⚠</span>
-                    {errors.stock}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Status
-                </label>
-                <div className="flex items-center h-12 px-4 py-3 bg-gray-50 rounded-xl border-2 border-gray-200">
-                  <div
-                    className={`w-3 h-3 rounded-full mr-3 ${
-                      formData.stock > 0 ? "bg-green-500" : "bg-red-500"
-                    }`}
-                  ></div>
-                  <span
-                    className={`text-sm font-medium ${
-                      formData.stock > 0 ? "text-green-700" : "text-red-700"
-                    }`}
-                  >
-                    {formData.stock > 0 ? "In Stock" : "Out of Stock"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
+           
             {/* Improved Buttons */}
             <div className="flex gap-4 pt-8 border-t border-gray-200">
               <Button

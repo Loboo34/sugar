@@ -205,7 +205,7 @@ export const getStoreItem = async (id: string) => {
 };
 export const addStoreItem = async (itemData: Item) => {
   try {
-    const response = await api.post("/store", itemData);
+    const response = await api.post("/stores", itemData);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
