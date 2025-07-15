@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const storeSchema = new mongoose.Schema({
-    ItemName: {
+    itemName: {
         type: String,
         required: true
     },
@@ -9,7 +9,7 @@ const storeSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    quantityType: {
+    unit: {
         type: String,
         required: true,
         enum: ["kg", "g", "liters", "units"]

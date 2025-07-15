@@ -3,13 +3,13 @@ import Store from "../models/store.model";
 import{ logger} from "../config/logger";
 
 export const createStoreItem = async (req: Request, res: Response) => {
-  const { ItemName, quantity, quantityType } = req.body;
+  const { itemName, quantity, unit } = req.body;
   logger.info("Creating store item with data:", { reqBody: req.body });
   try {
     const newItem = new Store({
-      ItemName,
+      itemName,
       quantity,
-      quantityType,
+      unit,
     });
 
     const savedItem = await newItem.save();

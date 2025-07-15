@@ -56,14 +56,14 @@ export const schemas = {
         paymentMethod: Joi.string().valid("cash", "Mpesa").optional()
     }),
     createStoreItem: Joi.object({
-        ItemName: Joi.string().min(1).max(100).required(),
+        itemName: Joi.string().min(1).max(100).required(),
         quantity: Joi.number().min(1).required(),
-        quantityType: Joi.string().valid("kg", "g", "liters", "units").required()
+        unit: Joi.string().valid("kg", "g", "liters", "units").required()
     }),
         updateStoreItem: Joi.object({
-        ItemName: Joi.string().min(1).max(100).optional(),
+        itemName: Joi.string().min(1).max(100).optional(),
         quantity: Joi.number().min(1).optional(),
-        quantityType: Joi.string().valid("kg", "g", "liters", "units").optional()
+        unit: Joi.string().valid("kg", "g", "liters", "units").optional()
     }),
     transferStoreItem: Joi.object({
         quantity: Joi.number().min(1).required(),
