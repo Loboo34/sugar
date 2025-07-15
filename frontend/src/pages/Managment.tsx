@@ -5,6 +5,8 @@ import { useProductStore } from "../store/product.store";
 import { useInventoryStore } from "../store/inventory.store";
 import AddProduct from "../components/AddProduct";
 import type { Product } from "../types";
+import  AddItem from "../components/AddItem";
+import type { Item } from "../types";
 
 
 export const Management = () => {
@@ -274,18 +276,80 @@ const ProductManagement: React.FC = () => {
 const ItemsManagement: React.FC = () => {
   const { items, addItem, updateItem, removeItem, fetchItems } =
     useInventoryStore();
+    const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const toggleModal = () => {
+    setIsOpen(!isOpen);
+  };
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
     <div>
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Item Management</h2>
-        <Button>
+        <Button onClick={toggleModal}>
           <Plus className="h-4 w-4" />
           Add Item
         </Button>
       </div>
+     {isOpen && (
+       <AddItem
+         onClose={toggleModal}
+       />
+     )}
+     <div className="mt-6">
+       <input
+         type="text"
+         placeholder="Search items..."
+         value={searchTerm}
+         onChange={(e) => setSearchTerm(e.target.value)}
+         className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+       />
+     </div>
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredItems.length === 0 ? (
+          <div className="col-span-full text-center text-gray-500">
+            No items found
+          </div>
+        ) : (
+          filteredItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">
+                {item.name}
+              </h3>
+              <p className="text-gray-600">Quantity: {item.quantity}</p>
+              <p className="text-gray-600">Unit: {item.unit}</p>
+              <p className="text-gray-600">Stock: {item.stock}</p>
+              <div className="mt-4 flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    /* Handle edit */
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeItem(item.id)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
-  );
+  )
 };
