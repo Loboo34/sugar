@@ -267,7 +267,7 @@ const ProductManagement: React.FC = () => {
 };
 
 const ItemsManagement: React.FC = () => {
-  const { items, updateItem, removeItem, fetchItems, isLoading } =
+  const { items, fetchItems, isLoading } =
     useInventoryStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -282,11 +282,13 @@ const ItemsManagement: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
-      await removeItem(id);
+  console.log("Deleting item with ID:", id);
     }
   };
 
-  const filteredItems = items.filter((item) =>
+    const safeItems = Array.isArray(items) ? items : [];
+
+  const filteredItems = safeItems.filter((item) =>
     item.itemName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -443,13 +445,13 @@ const ItemsManagement: React.FC = () => {
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-green-600">
-            {items.filter((item) => item.quantity > 0).length}
+            {safeItems.filter((item) => item.quantity > 0).length}
           </div>
           <div className="text-sm text-gray-600">In Stock</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-red-600">
-            {items.filter((item) => item.quantity === 0).length}
+            {safeItems.filter((item) => item.quantity === 0).length}
           </div>
           <div className="text-sm text-gray-600">Out of Stock</div>
         </div>

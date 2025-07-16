@@ -39,16 +39,10 @@ export const getStoreItems = async (req: Request, res: Response) => {
   try {
     const items = await Store.find();
     logger.info("Store items fetched successfully:", items);
-    res.status(200).json({
-      success: true,
-      data: items,
-    });
+    res.status(200).json(items)
   } catch (error: any) {
     logger.error(`Error fetching store items: ${error.message}`);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json(error)
   }
 };
 

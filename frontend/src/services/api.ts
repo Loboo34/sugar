@@ -183,7 +183,8 @@ export const deleteOrder = async (id: string) => {
 //store service
 export const getStoreItems = async () => {
   try {
-    const response = await api.get("/store");
+    const response = await api.get("/stores");
+    console.log("data:", response.data);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -194,7 +195,7 @@ export const getStoreItems = async () => {
 };
 export const getStoreItem = async (id: string) => {
   try {
-    const response = await api.get(`/store/${id}`);
+    const response = await api.get(`/stores/${id}`);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -205,7 +206,7 @@ export const getStoreItem = async (id: string) => {
 };
 export const addStoreItem = async (itemData: Item) => {
   try {
-    const response = await api.post("/stores", itemData);
+    const response = await api.post("/stores/", itemData);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -216,7 +217,7 @@ export const addStoreItem = async (itemData: Item) => {
 };
 export const updateStoreItem = async (id: string, itemData: Item) => {
   try {
-    const response = await api.put(`/store/${id}`, itemData);
+    const response = await api.put(`/stores/${id}`, itemData);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -227,7 +228,7 @@ export const updateStoreItem = async (id: string, itemData: Item) => {
 };
 export const deleteStoreItem = async (id: string) => {
   try {
-    const response = await api.delete(`/store/${id}`);
+    const response = await api.delete(`/stores/${id}`);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -238,7 +239,7 @@ export const deleteStoreItem = async (id: string) => {
 };
 export const transferStoreItem = async (id: string, transferData: { quantity: number; destination: string }) => {
   try {
-    const response = await api.post(`/store/${id}/transfer`, transferData);
+    const response = await api.post(`/stores/${id}/transfer`, transferData);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
