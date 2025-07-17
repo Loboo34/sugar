@@ -89,9 +89,14 @@ export const getProduct = async (id: string) => {
         throw error;
     }
 };
-export const addProduct = async (productData: Product) => {
+export const addProduct = async (productData: FormData) => {
   try {
-    const response = await api.post("/products", productData);
+    const response = await api.post("/products", productData, {
+      headers: {
+        "Content-Type": undefined,
+      },
+    });
+    
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {

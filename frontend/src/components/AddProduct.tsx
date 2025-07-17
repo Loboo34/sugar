@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Upload, Package } from "lucide-react";
+import { X, Upload, Package, Image } from "lucide-react";
 import { Button } from "./Button";
 import { useProductStore } from "../store/product.store";
 import type { Product } from "../types";
@@ -16,11 +16,12 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
     name: "",
     description: "",
     price: "",
-    image: "",
     category: "",
     stock: 0,
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const categories = [
@@ -56,8 +57,8 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
       newErrors.category = "Category is required";
     }
 
-    if (!formData.image.trim()) {
-      newErrors.image = "Image URL is required";
+    if (!imageFile) {
+      newErrors.image = "Product image is required";
     }
 
     if (formData.stock < 0) {
@@ -76,16 +77,18 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
     }
 
     try {
-      const productData: Omit<Product, "id"> = {
-        name: formData.name.trim(),
-        description: formData.description.trim(),
-        price: parseFloat(formData.price),
-        image: formData.image.trim(),
-        category: formData.category,
-        stock: formData.stock,
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name.trim());
+      formDataToSend.append("description", formData.description.trim());
+      formDataToSend.append("price", formData.price);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("stock", formData.stock.toString());
 
-      await createProduct(productData as Product);
+      if (imageFile) {
+        formDataToSend.append("image", imageFile);
+      }
+
+      await createProduct(formDataToSend);
       handleClose();
     } catch (error) {
       console.error("Error creating product:", error);
@@ -117,6 +120,58 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
         ...prev,
         [name]: "",
       }));
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setErrors((prev) => ({
+          ...prev,
+          image: "Please select a valid image file",
+        }));
+        return;
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          image: "Image size must be less than 5MB",
+        }));
+        return;
+      }
+
+      setImageFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Clear any existing errors
+      if (errors.image) {
+        setErrors((prev) => ({
+          ...prev,
+          image: "",
+        }));
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+    // Reset the file input
+    const fileInput = document.getElementById(
+      "image-upload"
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
     }
   };
 
@@ -269,23 +324,68 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Image URL */}
+          {/* Image Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-800 mb-2">
-              Image URL *
+              Product Image *
             </label>
-            <input
-              type="url"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 ${
-                errors.image
-                  ? "border-red-500 bg-red-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-              placeholder="https://example.com/image.jpg"
-            />
+
+            {!imagePreview ? (
+              <div className="relative">
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className={`w-full h-32 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
+                    errors.image
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-300 hover:border-amber-500"
+                  }`}
+                >
+                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-600 text-center">
+                    Click to upload image
+                    <br />
+                    <span className="text-xs text-gray-500">
+                      Supports: JPG, PNG, GIF (Max 5MB)
+                    </span>
+                  </span>
+                </label>
+              </div>
+            ) : (
+              <div className="relative">
+                <div className="border-2 border-gray-200 rounded-xl p-4 bg-gray-50">
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Product preview"
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors duration-200"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <p className="text-sm text-gray-600">{imageFile?.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {imageFile
+                        ? `${(imageFile.size / 1024 / 1024).toFixed(2)} MB`
+                        : ""}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {errors.image && (
               <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                 <span className="text-red-500">⚠</span>
@@ -294,28 +394,8 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
             )}
           </div>
 
-          {/* Image Preview */}
-          {formData.image && (
-            <div className="transform transition-all duration-300 ease-out animate-fadeIn">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preview
-              </label>
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <img
-                  src={formData.image}
-                  alt="Product preview"
-                  className="w-32 h-32 object-cover rounded-lg mx-auto transition-all duration-300 hover:scale-110"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* In Stock */}
+          {/* Stock Input */}
           <div className="grid grid-cols-2 gap-6">
-            {/* Enhanced Stock Input */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
                 Stock Quantity *
@@ -366,7 +446,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Improved Buttons */}
+          {/* Buttons */}
           <div className="flex gap-4 pt-8 border-t border-gray-200">
             <Button
               type="button"

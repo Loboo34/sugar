@@ -6,7 +6,7 @@ import { addProduct, getProduct, getProducts } from "../services/api";
 interface ProductStore {
   products: Product[];
   isLoading: boolean; // Fixed: was "flase"
-  createProduct: (product: Product) => Promise<void>; // Fixed: should be async
+  createProduct: (product: FormData) => Promise<void>; // Fixed: should be async
   update_product: (id: string, updatedProduct: Product) => Promise<void>; // Fixed: should be async
   removeProduct: (id: string) => void;
   fetchProducts: () => Promise<void>;
@@ -19,12 +19,12 @@ export const useProductStore = create<ProductStore>()(
       // Added get parameter
       products: [],
       isLoading: false, // Added missing implementation
-      createProduct: async (product: Product) => {
+      createProduct: async (product: FormData) => {
         try {
           set({ isLoading: true });
-          await addProduct(product);
+          const response = await addProduct(product);
           set((state) => ({
-            products: [...state.products, product],
+            products: [...state.products, response.product],
             isLoading: false,
           }));
         } catch (error) {
