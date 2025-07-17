@@ -46,6 +46,29 @@ export const getStoreItems = async (req: Request, res: Response) => {
   }
 };
 
+export const getStoreItem = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  logger.info(`Fetching store item with ID: ${id}`);
+  try {
+    const item = await Store.findById(id);
+    if (!item) {
+      logger.error(`Store item with ID ${id} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "Store item not found",
+      });
+    }
+    logger.info("Store item fetched successfully:", item);
+    res.status(200).json(item);
+  } catch (error: any) {
+    logger.error(`Error fetching store item: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
 export const updateStoreItem = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { ItemName, quantity, quantityType } = req.body;

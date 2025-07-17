@@ -55,7 +55,8 @@ export const useInventoryStore = create<InventoryStore>()(
                 try {
                     set({ isLoading: true });
                     const response = await getStoreItems();
-                    set({ items: response.data || [], isLoading: false });
+                  //  set({ items: response.data || [], isLoading: false });
+                  set({items: response, isLoading: false });
                 } catch (error) {
                     console.error("Error fetching items:", error);
                     set({ isLoading: false });

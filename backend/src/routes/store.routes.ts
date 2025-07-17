@@ -3,6 +3,7 @@ import { validate, schemas } from '../middleware/validation.middleware';
 import {
     createStoreItem,
     getStoreItems,
+    getStoreItem,
     updateStoreItem,
     deleteStoreItem,
     transferStoreItem
@@ -10,8 +11,11 @@ import {
 
 const router = Router();
 
-router.post("/", validate(schemas.createStoreItem), createStoreItem);
 router.get("/", getStoreItems);
+router.get("/:id", getStoreItem);
+
+router.post("/", validate(schemas.createStoreItem), createStoreItem);
+
 router.put("/:id", validate(schemas.updateStoreItem), updateStoreItem);
 router.delete("/:id", deleteStoreItem);
 router.post("/:id/transfer", validate(schemas.transferStoreItem), transferStoreItem);
