@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Settings, Package, Plus, Edit2, Trash2 } from "lucide-react";
 import { Button } from "../components/Button";
 import { useProductStore } from "../store/product.store";
@@ -56,11 +56,18 @@ export const Management = () => {
 };
 
 const ProductManagement: React.FC = () => {
-  const { products, update_product, removeProduct, fetchProducts, isLoading } =
-    useProductStore();
+  const {
+    products,
+    update_product,
+    removeProduct,
+    fetchProducts,
+    fetchProduct,
+    isLoading,
+  } = useProductStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -70,11 +77,43 @@ const ProductManagement: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      await removeProduct(id);
-    }
-  };
+  const handleDelete = useCallback(
+    async (id: string, e?: React.MouseEvent) => {
+      // Stop event propagation if event is provided
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      // Prevent multiple simultaneous delete operations
+      if (!id || deletingId) return;
+
+      // Confirm deletion
+      if (
+        !window.confirm(
+          "Are you sure you want to delete this product? This action cannot be undone."
+        )
+      ) {
+        return;
+      }
+
+      try {
+        setDeletingId(id);
+        await removeProduct(id);
+        await fetchProducts();
+        //toast.success("Product deleted successfully");
+      } catch (error: unknown) {
+        console.error("Error deleting product:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to delete product";
+        console.error(errorMessage);
+        // toast.error(errorMessage);
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [removeProduct, fetchProducts, deletingId]
+  );
 
   const handleUpdate = async (id: string, data: Product) => {
     if (window.confirm("Are you sure you want to update this product?")) {
@@ -230,9 +269,10 @@ const ProductManagement: React.FC = () => {
                     size="sm"
                     className="flex-1 text-red-600 border-red-600 hover:bg-red-50"
                     onClick={() => handleDelete(product.id)}
+                    disabled={deletingId === product.id}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
+                    {deletingId === product.id ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
               </div>
@@ -267,8 +307,7 @@ const ProductManagement: React.FC = () => {
 };
 
 const ItemsManagement: React.FC = () => {
-  const { items, fetchItems, isLoading } =
-    useInventoryStore();
+  const { items, fetchItems, isLoading } = useInventoryStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -282,11 +321,11 @@ const ItemsManagement: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
-  console.log("Deleting item with ID:", id);
+      console.log("Deleting item with ID:", id);
     }
   };
 
-    const safeItems = Array.isArray(items) ? items : [];
+  const safeItems = Array.isArray(items) ? items : [];
 
   const filteredItems = safeItems.filter((item) =>
     item.itemName.toLowerCase().includes(searchTerm.toLowerCase())

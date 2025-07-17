@@ -6,7 +6,12 @@ import { logger } from "../config/logger";
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const products = await Product.find();
-    res.status(200).json(products);
+    // Map _id to id for each product
+    const mapped = products.map((p) => ({
+      ...p.toObject(),
+      id: p._id.toString(),
+    }));
+    res.status(200).json(mapped);
   } catch (error: any) {
     logger.error(`Error fetching products: ${error.message}`);
     res
@@ -23,7 +28,9 @@ export const getProduct = async (req: Request, res: Response) => {
       res.status(404).json({ message: "Product not found" });
       return;
     }
-    res.status(200).json(product);
+    // Map _id to id for single product
+    const mapped = { ...product.toObject(), id: product._id.toString() };
+    res.status(200).json(mapped);
   } catch (error: any) {
     logger.error(`Error fetching product: ${error.message}`);
     res
@@ -33,47 +40,46 @@ export const getProduct = async (req: Request, res: Response) => {
 };
 
 export const addProduct = async (req: Request, res: Response) => {
-  const { name, description, price,  category, stock } = req.body;
+  const { name, description, price, category, stock } = req.body;
   logger.info(`Adding product: ${name}`);
 
- let imageUrl = "";
- if (req.file) {
-   try {
-     // Fix: resolve with the whole result, not just secure_url
-     const result = await new Promise<any>((resolve, reject) => {
-       cloudinary.uploader
-         .upload_stream(
-           { resource_type: "image", folder: "products" },
-           (error, result) => {
-             if (error) {
-               logger.error(`Error uploading image: ${error.message}`);
-               reject(error);
-             } else {
-               resolve(result); // resolve the whole result object
-             }
-           }
-         )
-         .end(req.file?.buffer);
-     });
-     imageUrl = result.secure_url; // Now this will work!
-   } catch (error: unknown) {
-     logger.error(
-       `Error uploading image: ${
-         error instanceof Error ? error.message : "Unknown error"
-       }`
-     );
-     return res.status(500).json({
-       message: "Error uploading image",
-       error: error instanceof Error ? error.message : "Unknown error",
-     });
-   }
- } else {
-   return res.status(400).json({
-     success: false,
-     message: "image required",
-   });
- }
-
+  let imageUrl = "";
+  if (req.file) {
+    try {
+      // Fix: resolve with the whole result, not just secure_url
+      const result = await new Promise<any>((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { resource_type: "image", folder: "products" },
+            (error, result) => {
+              if (error) {
+                logger.error(`Error uploading image: ${error.message}`);
+                reject(error);
+              } else {
+                resolve(result); // resolve the whole result object
+              }
+            }
+          )
+          .end(req.file?.buffer);
+      });
+      imageUrl = result.secure_url; // Now this will work!
+    } catch (error: unknown) {
+      logger.error(
+        `Error uploading image: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+      return res.status(500).json({
+        message: "Error uploading image",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: "image required",
+    });
+  }
 
   try {
     const newProduct = new Product({
@@ -101,7 +107,7 @@ export const addProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   const productId = req.params.id;
-  const { name, description, price,  category, stock } = req.body;
+  const { name, description, price, category, stock } = req.body;
   logger.info(`Updating product: ${productId}`);
   if (!productId) {
     res.status(400).json({ message: "Product ID is required" });
@@ -109,33 +115,37 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 
   let imageUrl = "";
-if (req.file) {
-  try{
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { resource_type: "image" },
-        (error, result) => {
-          if (error) {
-            logger.error(`Error uploading image: ${error.message}`);
-            reject(error);
-          } else {
-            resolve(result?.secure_url || "");
-          }
-        }
-      ).end(req.file?.buffer); // Ensure the file buffer is passed to the upload stream
+  if (req.file) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ resource_type: "image" }, (error, result) => {
+            if (error) {
+              logger.error(`Error uploading image: ${error.message}`);
+              reject(error);
+            } else {
+              resolve(result?.secure_url || "");
+            }
+          })
+          .end(req.file?.buffer); // Ensure the file buffer is passed to the upload stream
       });
       imageUrl = (result as any).secure_url;
     } catch (error: unknown) {
-      logger.error(`Error uploading image: ${error instanceof Error ? error.message : "Unknown error"}`);
+      logger.error(
+        `Error uploading image: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
       res
         .status(500)
-        .json({ message: "Error uploading image", error: error instanceof Error ? error.message : "Unknown error" });
+        .json({
+          message: "Error uploading image",
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       return;
+    }
   }
-}
 
-
-  
   try {
     const existing = await Product.findByIdAndUpdate(
       productId,

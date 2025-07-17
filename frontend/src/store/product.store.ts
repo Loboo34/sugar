@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "../types";
-import { addProduct, getProduct, getProducts } from "../services/api";
+import { addProduct, deleteProduct, getProduct, getProducts } from "../services/api";
 
 interface ProductStore {
   products: Product[];
@@ -51,8 +51,9 @@ export const useProductStore = create<ProductStore>()(
           set({ isLoading: false });
         }
       },
-      removeProduct: (id: string) => {
+      removeProduct: async (id: string) => {
         try {
+          await deleteProduct(id);
           set((state) => ({
             products: state.products.filter((product) => product.id !== id),
           }));
@@ -64,7 +65,13 @@ export const useProductStore = create<ProductStore>()(
         try {
           set({ isLoading: true });
           const products = await getProducts();
-          set({ products, isLoading: false });
+          // Map _id to id for each product
+          const mapped = products.map((p: any) => ({
+            ...p,
+            id: p._id || p.id,
+          }));
+          console.log("data:", mapped)
+          set({ products: mapped, isLoading: false });
         } catch (error) {
           console.error("Error fetching products:", error);
           set({ isLoading: false });
