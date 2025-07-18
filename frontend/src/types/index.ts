@@ -35,8 +35,8 @@ export interface User{
 }
 
 export interface CartItem {
-    productId: string;
+    product: Product;
     quantity: number;
     subtotal: number;
 }
-
+export type PaymentMethod = "cash"  | "mpesa";
