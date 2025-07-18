@@ -6,18 +6,20 @@ import type { Product } from "../types";
 
 interface AddProductProps {
   onClose: () => void;
+  product?: Product | null; // <-- add this
 }
 
-const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
-  const { createProduct, isLoading } = useProductStore();
+const AddProduct: React.FC<AddProductProps> = ({ onClose, product }) => {
+  const { createProduct, update_product, isLoading } = useProductStore();
   const [isVisible, setIsVisible] = useState(false);
+  const isEdit = !!product
 
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    stock: 0,
+    name: product?.name || "",
+    description: product?.description || "",
+    price: product?.price?.toString() || "",
+    category: product?.category || "",
+    stock: product?.stock ?? 0,
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -57,7 +59,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
       newErrors.category = "Category is required";
     }
 
-    if (!imageFile) {
+    if (!imageFile && !isEdit) {
       newErrors.image = "Product image is required";
     }
 
@@ -67,6 +69,27 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  useEffect(() => {
+    if(product) {
+      setFormData({
+        name: product.name,
+        description: product.description,
+        price:product.price.toString(),
+        category:product.category,
+        stock:product.stock
+      });
+      setImagePreview(product.image || "");
+      setImageFile(null);
+    }
+  }, [product]);
+
+    const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,19 +111,30 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose }) => {
         formDataToSend.append("image", imageFile);
       }
 
-      await createProduct(formDataToSend);
-      handleClose();
+    try{
+      if(isEdit && product) {
+        await update_product(product.id, formDataToSend);
+      } else {
+          await createProduct(formDataToSend);
+      }
+         handleClose();
     } catch (error) {
-      console.error("Error creating product:", error);
+      console.error("Error creating/updating product:", error);
+      setErrors((prev) => ({
+        ...prev,
+        form: "Failed to create/update product. Please try again.",
+      }));
     }
-  };
+  } catch (error) {
+      console.error("Error creating product:", error);
+      setErrors((prev) => ({
+        ...prev,
+        form: "Failed to create product. Please try again.",
+      }));
+    }
+  }
 
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
+
 
   const handleChange = (
     e: React.ChangeEvent<

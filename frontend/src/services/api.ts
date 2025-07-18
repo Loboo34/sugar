@@ -105,9 +105,13 @@ export const addProduct = async (productData: FormData) => {
     throw error;
   }
 };
-export const updateProduct = async (id: string, productData: Product) => {
+export const updateProduct = async (id: string, productData: FormData) => {
   try {
-    const response = await api.put(`/products/${id}`, productData);
+    const response = await api.put(`/products/${id}`, productData, {
+      headers: {
+        "Content-Type": undefined,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {

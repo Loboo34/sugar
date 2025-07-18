@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "../types";
-import { addProduct, deleteProduct, getProduct, getProducts } from "../services/api";
+import { addProduct, deleteProduct, getProduct, getProducts, updateProduct } from "../services/api";
 
 interface ProductStore {
   products: Product[];
   isLoading: boolean; // Fixed: was "flase"
   createProduct: (product: FormData) => Promise<void>; // Fixed: should be async
-  update_product: (id: string, updatedProduct: Product) => Promise<void>; // Fixed: should be async
+  update_product: (id: string, updatedProduct: FormData) => Promise<void>; // Fixed: should be async
   removeProduct: (id: string) => void;
   fetchProducts: () => Promise<void>;
   fetchProduct: (id: string) => Promise<Product | null>;
@@ -32,10 +32,10 @@ export const useProductStore = create<ProductStore>()(
           set({ isLoading: false });
         }
       },
-      update_product: async (id: string, updatedProduct: Product) => {
+      update_product: async (id: string, updatedProduct: FormData) => {
         try {
           set({ isLoading: true });
-          const product = await getProduct(id);
+          const product = await updateProduct(id, updatedProduct);
           if (product) {
             set((state) => ({
               products: state.products.map((p) =>

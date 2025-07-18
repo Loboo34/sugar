@@ -58,7 +58,6 @@ export const Management = () => {
 const ProductManagement: React.FC = () => {
   const {
     products,
-    update_product,
     removeProduct,
     fetchProducts,
     fetchProduct,
@@ -68,6 +67,7 @@ const ProductManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editProduct, setEditProduct] = useState<Product | null>(null)
 
   useEffect(() => {
     fetchProducts();
@@ -79,13 +79,13 @@ const ProductManagement: React.FC = () => {
 
   const handleDelete = useCallback(
     async (id: string, e?: React.MouseEvent) => {
-      // Stop event propagation if event is provided
+   
       if (e) {
         e.stopPropagation();
         e.preventDefault();
       }
 
-      // Prevent multiple simultaneous delete operations
+   
       if (!id || deletingId) return;
 
       // Confirm deletion
@@ -115,11 +115,6 @@ const ProductManagement: React.FC = () => {
     [removeProduct, fetchProducts, deletingId]
   );
 
-  const handleUpdate = async (id: string, data: Product) => {
-    if (window.confirm("Are you sure you want to update this product?")) {
-      await update_product(id, data);
-    }
-  };
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -258,7 +253,8 @@ const ProductManagement: React.FC = () => {
                     size="sm"
                     className="flex-1 text-amber-600 border-amber-600 hover:bg-amber-50"
                     onClick={() => {
-                      /* Handle edit */
+                      setEditProduct(product);
+                      setIsOpen(true);
                     }}
                   >
                     <Edit2 className="h-4 w-4 mr-1" />
@@ -275,6 +271,15 @@ const ProductManagement: React.FC = () => {
                     {deletingId === product.id ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
+                {isOpen && (
+                  <AddProduct
+                    onClose={() => {
+                      setIsOpen(false);
+                      setEditProduct(null);
+                    }}
+                    product={editProduct}
+                  />
+                )}
               </div>
             </div>
           ))}

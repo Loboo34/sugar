@@ -46,7 +46,7 @@ export const addProduct = async (req: Request, res: Response) => {
   let imageUrl = "";
   if (req.file) {
     try {
-      // Fix: resolve with the whole result, not just secure_url
+     
       const result = await new Promise<any>((resolve, reject) => {
         cloudinary.uploader
           .upload_stream(
@@ -56,13 +56,13 @@ export const addProduct = async (req: Request, res: Response) => {
                 logger.error(`Error uploading image: ${error.message}`);
                 reject(error);
               } else {
-                resolve(result); // resolve the whole result object
+                resolve(result); 
               }
             }
           )
           .end(req.file?.buffer);
       });
-      imageUrl = result.secure_url; // Now this will work!
+      imageUrl = result.secure_url;
     } catch (error: unknown) {
       logger.error(
         `Error uploading image: ${
@@ -114,49 +114,54 @@ export const updateProduct = async (req: Request, res: Response) => {
     return;
   }
 
-  let imageUrl = "";
+  let imageUrl: string | undefined;
   if (req.file) {
     try {
-      const result = await new Promise((resolve, reject) => {
+    
+      const result = await new Promise<any>((resolve, reject) => {
         cloudinary.uploader
-          .upload_stream({ resource_type: "image" }, (error, result) => {
-            if (error) {
-              logger.error(`Error uploading image: ${error.message}`);
-              reject(error);
-            } else {
-              resolve(result?.secure_url || "");
+          .upload_stream(
+            { resource_type: "image", folder: "products" },
+            (error, result) => {
+              if (error) {
+                logger.error(`Error uploading image: ${error.message}`);
+                reject(error);
+              } else {
+                resolve(result); 
+              }
             }
-          })
-          .end(req.file?.buffer); // Ensure the file buffer is passed to the upload stream
+          )
+          .end(req.file?.buffer);
       });
-      imageUrl = (result as any).secure_url;
+      imageUrl = result.secure_url; 
     } catch (error: unknown) {
       logger.error(
         `Error uploading image: ${
           error instanceof Error ? error.message : "Unknown error"
         }`
       );
-      res
-        .status(500)
-        .json({
-          message: "Error uploading image",
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
-      return;
+      return res.status(500).json({
+        message: "Error uploading image",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
-  }
+  } 
+
+  const updateData: any = {};
+  if(name) updateData.name = name;
+  if(description) updateData.description = description;
+  if(price) updateData.price =price;
+  if(category) updateData.category = category;
+  if(stock !== undefined) updateData.stock = stock;
+  if(imageUrl) updateData.image = imageUrl;
+
+
 
   try {
     const existing = await Product.findByIdAndUpdate(
       productId,
-      {
-        name,
-        description,
-        price,
-        image: imageUrl,
-        category,
-        stock,
-      },
+      updateData,
+      
       { new: true }
     );
 
