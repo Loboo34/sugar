@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Item } from "../types";
-import { addStoreItem, getStoreItem, getStoreItems, updateStoreItem } from "../services/api";
+import { addStoreItem, deleteStoreItem, getStoreItem, getStoreItems, updateStoreItem } from "../services/api";
 
 interface InventoryStore {
     items: Item[];
@@ -46,7 +46,12 @@ export const useInventoryStore = create<InventoryStore>()(
                     set({ isLoading: false });
                 }
             },
-            removeItem: (id: string) => {
+            removeItem:  async (id: string) => {
+                const response = await deleteStoreItem(id);
+                if (response.error) {
+                    console.error("Error deleting item:", response.error);
+                    return;
+                }
                 set((state) => ({
                     items: state.items.filter((item) => item.id !== id),
                 }));
@@ -56,7 +61,11 @@ export const useInventoryStore = create<InventoryStore>()(
                     set({ isLoading: true });
                     const response = await getStoreItems();
                   //  set({ items: response.data || [], isLoading: false });
-                  set({items: response, isLoading: false });
+                 const mapped = response.map((item: any) => ({
+                    ...item,
+                    id: item._id, // Assuming the API returns _id as the identifier
+                 }));
+                 set({items: mapped, isLoading: false})
                 } catch (error) {
                     console.error("Error fetching items:", error);
                     set({ isLoading: false });

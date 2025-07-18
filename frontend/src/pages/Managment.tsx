@@ -312,9 +312,11 @@ const ProductManagement: React.FC = () => {
 };
 
 const ItemsManagement: React.FC = () => {
-  const { items, fetchItems, isLoading } = useInventoryStore();
+  const { items, fetchItems, removeItem, isLoading } = useInventoryStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [update, setUpdate] = useState<Item | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchItems();
@@ -325,9 +327,32 @@ const ItemsManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      console.log("Deleting item with ID:", id);
+    if (!id || deletingId) return;
+
+    // Confirm deletion
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this item? This action cannot be undone."
+      )
+    ) {
+      return;
     }
+
+    try {
+      setDeletingId(id);
+      await removeItem(id);
+      await fetchItems();
+      //toast.success("Item deleted successfully");
+    } catch (error: unknown) {
+      console.error("Error deleting item:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete item";
+      console.error(errorMessage);
+      // toast.error(errorMessage);
+    } finally {
+      setDeletingId(null);
+    }
+    
   };
 
   const safeItems = Array.isArray(items) ? items : [];
@@ -457,7 +482,8 @@ const ItemsManagement: React.FC = () => {
                     size="sm"
                     className="flex-1 text-amber-600 border-amber-600 hover:bg-amber-50"
                     onClick={() => {
-                      /* Handle edit */
+                      setUpdate(item);
+                      setIsOpen(true);
                     }}
                   >
                     <Edit2 className="h-4 w-4 mr-1" />
@@ -468,11 +494,19 @@ const ItemsManagement: React.FC = () => {
                     size="sm"
                     className="flex-1 text-red-600 border-red-600 hover:bg-red-50"
                     onClick={() => handleDelete(item.id)}
+                    disabled={deletingId === item.id}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     Delete
                   </Button>
                 </div>
+                {isOpen && (
+                  <AddItem onClose={() => {
+                    setIsOpen(false);
+                    setUpdate(null);
+                  }}
+                  item={update} />
+                )}
               </div>
             </div>
           ))}

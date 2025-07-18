@@ -232,7 +232,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, product }) => {
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <Package className="h-6 w-6 text-amber-600" />
-            <h2 className="text-xl font-bold text-gray-800">Add New Product</h2>
+            <h2 className="text-xl font-bold text-gray-800">{isEdit ? "Edit Product" : "Add New Product"}</h2>
           </div>
           <button
             onClick={handleClose}
@@ -495,7 +495,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, product }) => {
               loading={isLoading}
               className="flex-1 py-3 text-base font-medium bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
             >
-              {isLoading ? "Adding Product..." : "Add Product"}
+              {isLoading ? "Adding Product..." :  isEdit ? "Update Product" : "Add Product"}
             </Button>
           </div>
         </form>
