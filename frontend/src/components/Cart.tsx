@@ -31,6 +31,14 @@ const Cart = () => {
     }
   };
 
+  // New function to handle direct input changes
+  const handleQuantityInput = (productId: string, value: string) => {
+    const newQuantity = parseInt(value) || 0;
+    if (newQuantity >= 0) {
+      handleQuantityChange(productId, newQuantity);
+    }
+  };
+
   const paymentOptions = [
     { method: "cash" as PaymentMethod, label: "Cash", icon: Banknote },
     { method: "card" as PaymentMethod, label: "Card", icon: CreditCard },
@@ -108,7 +116,7 @@ const Cart = () => {
 
                     {/* Quantity Controls */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-1">
+                      <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -123,9 +131,17 @@ const Cart = () => {
                           <Minus className="h-4 w-4" />
                         </Button>
 
-                        <span className="font-semibold text-gray-800 min-w-[2rem] text-center">
-                          {item.quantity}
-                        </span>
+                        {/* Direct quantity input */}
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleQuantityInput(item.product.id, e.target.value)
+                          }
+                          className="w-12 text-center font-semibold text-gray-800 bg-transparent border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          onFocus={(e) => e.target.select()} // Select all text when focused
+                        />
 
                         <Button
                           variant="ghost"
