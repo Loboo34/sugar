@@ -14,6 +14,9 @@ const storeSchema = new mongoose.Schema({
         required: true,
         enum: ["kg", "g", "liters", "units"]
     },
+    stock: {
+        type: Number,   },
+
 
 });
 
