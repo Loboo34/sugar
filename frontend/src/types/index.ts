@@ -19,7 +19,7 @@ export interface Order {
   id: string;
   user: string;
   products: {
-    productId: string;
+    product: string;
     quantity: number;
   }[];
   totalAmount: number;

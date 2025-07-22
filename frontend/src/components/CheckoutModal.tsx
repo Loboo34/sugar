@@ -25,7 +25,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
   const [success, setSuccess] = useState(false);
   const { user } = useAuthStore();
   const userId = user?._id || user?.id;
-  console.log("user:", userId);
+ // console.log("user:", userId);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -53,13 +53,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
     try {
       const orderData = {
         products: items.map((item) => ({
-          productId: item.product.id,
+          product: item.product.id,
           quantity: item.quantity,
         })),
         paymentMethod: paymentMethod,
         user: userId,
         totalAmount: totalAmount,
       };
+      console.log("order:", orderData);
       await makeOrder(orderData);
       setSuccess(true);
       setTimeout(() => {
