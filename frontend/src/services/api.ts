@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { Item, Order, Product, User } from "../types";
 const ApiUrl = import.meta.env.VITE_API_URL;
+type Neworder = Omit<Order, "id"> 
 
 export const api = axios.create({
   baseURL: ApiUrl,
@@ -155,7 +156,7 @@ export const getOrder = async (id: string) => {
     throw error;
   }
 };
-export const createOrder = async (orderData: Order) => {
+export const createOrder = async (orderData: Neworder) => {
   try {
     const response = await api.post("/orders", orderData);
     return response.data;

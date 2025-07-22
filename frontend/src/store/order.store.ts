@@ -2,11 +2,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Order } from "../types";
 import { createOrder, deleteOrder, getOrder, getOrders, updateOrder } from "../services/api";
-
+type Neworder = Omit<Order, "id">;
 interface OrderStore {
     orders: Order[];
     isLoading: boolean;
-    makeOrder: (order: Order) => Promise<void>;
+    makeOrder: (order: Neworder) => Promise<void>;
     fetchOrders: () => Promise<void>;
     fetchOrder: (id: string) => Promise<Order | null>;
     updateOrder: (id: string, order: Order) => Promise<void>;
@@ -18,14 +18,14 @@ export const useOrderStore = create<OrderStore>()(
         (set) => ({
             orders: [],
             isLoading: false,
-            makeOrder: async (order: Order) => {
+            makeOrder: async (order: Neworder) => {
                 try {
-                    set({ isLoading: true});
-                    await createOrder(order);
+                    set({ isLoading: true });
+                   const newOrder = await createOrder(order);
                     set((state) => ({
-                        orders: [...state.orders, order],
+                        orders: [...state.orders, newOrder],
                         isLoading: false,
-                    }))
+                    }));
                 } catch (error) {
                     console.error("Error creating order:", error);
                     set({ isLoading: false });

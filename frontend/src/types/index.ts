@@ -1,42 +1,41 @@
 export interface Product {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    image: string;
-    category: string;
-    stock: number;
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  stock: number;
 }
 
 export interface Item {
-    id: string;
-    itemName: string;
-    quantity: number;
-    unit: string;
+  id: string;
+  itemName: string;
+  quantity: number;
+  unit: string;
 }
 
 export interface Order {
-    id: string;
-    products: [
-        {
-            productId: string;
-            quantity: number;
-        }
-    ];
-    totalAmount: number;
-    paymentMethod: "cash" | "Mpesa";
+  id: string;
+  user: string;
+  products: {
+    productId: string;
+    quantity: number;
+  }[];
+  totalAmount: number;
+  paymentMethod: "cash" | "Mpesa";
 }
 
-export interface User{
-    id: string;
-    name: string;
-    email: string;
-    role: "admin" | "user"; 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "user";
 }
 
 export interface CartItem {
-    product: Product;
-    quantity: number;
-    subtotal: number;
+  product: Product;
+  quantity: number;
+  subtotal: number;
 }
-export type PaymentMethod = "cash"  | "mpesa";
+export type PaymentMethod = "cash" | "Mpesa";
