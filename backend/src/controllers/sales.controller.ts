@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import Order from "../models/order.model";
 import Store from "../models/store.model";
 import { logger } from "../config/logger";
@@ -64,19 +65,35 @@ export const getTotalSalesForProduct = async (req: Request, res: Response) => {
   const { productId } = req.params;
   try {
     const totalSales = await Order.aggregate([
+     {$unwind: "$products"},
+     {$match: { "products.product": new mongoose.Types.ObjectId(productId) }},
       {
-        $match: { "items.productId": productId },
+        $lookup: {
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
       },
-      {
-        $unwind: "$items",
-      },
-      {
-        $match: { "products.productId": productId },
-      },
+      { $unwind: "$productDetails" },
       {
         $group: {
-          _id: "$products.productId",
-          totalAmount: { $sum: "$products.price" },
+          _id: "$products.product",
+          totalQuantity: { $sum: "$products.quantity" },
+          totalAmount: {
+            $sum: { $multiply: ["$productDetails.price", "$products.quantity"] },
+          },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          productId: "$_id",
+          totalQuantity: 1,
+          totalAmount: 1,
+          totalOrders: 1,
+          product: "$productDetails"
         },
       },
     ]);
@@ -85,7 +102,7 @@ export const getTotalSalesForProduct = async (req: Request, res: Response) => {
       logger.info(`No sales found for product ${productId}`);
       return res.status(200).json({
         success: true,
-        data: { totalAmount: 0 },
+        data: { totalAmount: 0, totalQuantity: 0, totalOrders: 0 },
       });
     }
 
