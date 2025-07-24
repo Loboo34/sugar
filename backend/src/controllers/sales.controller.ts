@@ -21,6 +21,10 @@ export const getTotalSales = async (req: Request, res: Response) => {
         $group: {
           _id: "$products.product",
           totalQuantity: { $sum: "$products.quantity" },
+          productName: {$first: "$productDetails.name"},
+         // productImage: {$first: "$productDetails.image"},
+         // productPrice: {$first: "$productDetails.price"},
+          productCategory: {$first: "$productDetails.category"},
           totalAmount: {
             $sum: { $multiply: ["$productDetails.price", "$products.quantity"] },
           },
@@ -34,7 +38,12 @@ export const getTotalSales = async (req: Request, res: Response) => {
           totalQuantity: 1,
           totalAmount: 1,
           totalOrders: 1,
-          product: "$productDetails"
+          product: {
+            name: "$productName",
+            category: "$productCategory",
+            // image: "$productImage",
+            // price: "$productPrice",
+          }
         },
       },
     ]);

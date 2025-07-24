@@ -6,6 +6,7 @@ import { useAuthStore } from "./store/auth.store";
 import Login from "./pages/Login";
 import { Management } from "./pages/Managment";
 import SalesTerminal from "./pages/SalesTerminal";
+import Reports from "./pages/Reports";
 
 const App = () => {
   const {user, isLoading, getProfile} = useAuthStore();
@@ -32,7 +33,7 @@ const App = () => {
             <Routes>
               <Route path="/management" element={<Management />} />
               <Route path="/sales" element={<SalesTerminal />} />
-
+              <Route path="/reports" element={<Reports />} />
               {/* <Route path="/" element={<Navigate to="/sales" replace />} />
               <Route path="/sales" element={<SalesTerminal />} />
               <Route path="/transfers" element={<InventoryTransfers />} />

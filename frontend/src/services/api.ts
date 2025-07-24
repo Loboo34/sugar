@@ -282,11 +282,9 @@ export const getTotalSales = async () => {
     throw error;
   }
 };
-export const getSalesByTimeframe = async (startDate: string, endDate: string) => {
+export const getSalesByTimeframe = async (timeFrame: string) => {
   try {
-    const response = await api.get("/sales/sales-by-timeframe", {
-      params: { startDate, endDate },
-    });
+    const response = await api.get(`/sales/timeframe/${timeFrame}`);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
