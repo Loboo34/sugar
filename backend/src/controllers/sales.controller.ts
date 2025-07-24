@@ -128,55 +128,67 @@ export const getTotalSalesForProduct = async (req: Request, res: Response) => {
 //get total daily/weekly/monthly sales
 export const getSalesByTimeframe = async (req: Request, res: Response) => {
   const { timeFrame } = req.params;
-  try {
+ try{
+    const matchStage: any = {};
+    if (timeFrame === "daily") {
+      matchStage.createdAt = { $gte: new Date(new Date().setHours(0, 0, 0, 0)) };
+    } else if (timeFrame === "weekly") {
+      matchStage.createdAt = { $gte: new Date(new Date().setDate(new Date().getDate() - 7)) };
+    } else if (timeFrame === "monthly") {
+      matchStage.createdAt = { $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)) };
+    }
+
     const salesData = await Order.aggregate([
+      { $match: matchStage },
+      { $unwind: "$products" },
       {
-        $match: {
-          createdAt: {
-            $gte: new Date(
-              new Date().setDate(
-                new Date().getDate() -
-                  (timeFrame === "daily" ? 1 : timeFrame === "weekly" ? 7 : 30)
-              )
-            ),
-            $lt: new Date(),
-          },
+        $lookup: {
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "productDetails",
         },
       },
+      { $unwind: "$productDetails" },
       {
         $group: {
           _id: null,
-          totalAmount: { $sum: "$totalPrice" },
+          totalQuantity: { $sum: "$products.quantity" },
+          totalAmount: { $sum: { $multiply: ["$productDetails.price", "$products.quantity"] } },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalQuantity: 1,
+          totalAmount: 1,
+          totalOrders: 1,
         },
       },
     ]);
 
     if (salesData.length === 0) {
-      logger.info(`No sales found for timeframe ${timeFrame}`);
+      logger.info(`No sales found for ${timeFrame}`);
       return res.status(200).json({
         success: true,
-        data: { totalAmount: 0 },
+        data: { totalAmount: 0, totalQuantity: 0, totalOrders: 0 },
       });
     }
 
-    logger.info(
-      `Total sales for timeframe ${timeFrame} fetched successfully:`,
-      salesData[0]
-    );
+    logger.info(`Sales data for ${timeFrame} fetched successfully`, salesData[0]);
     res.status(200).json({
       success: true,
       data: salesData[0],
     });
   } catch (error: any) {
-    logger.error(
-      `Error fetching sales for timeframe ${timeFrame}: ${error.message}`
-    );
+    logger.error(`Error fetching sales by timeframe ${timeFrame}: ${error.message}`);
     res.status(500).json({
       success: false,
       message: "Internal server error",
     });
   }
-};
+};    
 
 export const getExpenses = async (req: Request, res: Response) => {
   try {
