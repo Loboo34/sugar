@@ -9,7 +9,7 @@ const Navigation = () => {
 
   const navItems = [
     {
-      to: '/sales',
+      to: '/',
       icon: CashRegister,
       label: 'Sales Terminal',
       roles: ['admin', 'cashier']

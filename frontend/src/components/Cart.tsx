@@ -51,17 +51,17 @@ const Cart = () => {
     <>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Header - More Space */}
-        <div className="p-6 bg-gray-50 border-b border-gray-200">
+        <div className="p-6 bg-amber-50 border-b border-amber-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-xl">
-                <ShoppingBag className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-amber-100 rounded-xl">
+                <ShoppingBag className="h-6 w-6 text-amber-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-amber-800">
                   Shopping Cart
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-amber-600">
                   {items.length} items selected
                 </p>
               </div>
@@ -101,7 +101,7 @@ const Cart = () => {
                     className="bg-gray-50 rounded-xl p-5 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-start gap-4">
-                      {/* Product Image */}
+                      {/* Product Image with Quantity Controls */}
                       {item.product.image && (
                         <div className="flex-shrink-0">
                           <img
@@ -109,6 +109,54 @@ const Cart = () => {
                             alt={item.product.name}
                             className="w-20 h-20 object-cover rounded-xl border border-gray-200"
                           />
+                          {/* Quantity Controls Below Image */}
+                          <div className="mt-3">
+                            <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-300 p-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.product.id,
+                                    item.quantity - 1
+                                  )
+                                }
+                                className="w-8 h-8 p-0 hover:bg-gray-100 rounded-lg"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+
+                              {/* Number Input for Quantity */}
+                              <input
+                                type="number"
+                                min={1}
+                                max={item.product.stock}
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  if (val > 0 && val <= item.product.stock) {
+                                    handleQuantityChange(item.product.id, val);
+                                  }
+                                }}
+                                className="w-14 text-center font-bold text-sm text-gray-900 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                              />
+
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.product.id,
+                                    item.quantity + 1
+                                  )
+                                }
+                                className="w-8 h-8 p-0 hover:bg-gray-100 rounded-lg"
+                                disabled={item.quantity >= item.product.stock}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       )}
 
@@ -121,56 +169,25 @@ const Cart = () => {
                           ${item.product.price.toFixed(2)} each
                         </p>
 
-                        {/* Quantity Controls - More Space */}
+                        {/* Subtotal and Remove */}
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-300 p-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                handleQuantityChange(
-                                  item.product.id,
-                                  item.quantity - 1
-                                )
-                              }
-                              className="w-10 h-10 p-0 hover:bg-gray-100 rounded-lg"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-
-                            <span className="w-16 text-center font-bold text-lg text-gray-900">
-                              {item.quantity}
-                            </span>
-
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                handleQuantityChange(
-                                  item.product.id,
-                                  item.quantity + 1
-                                )
-                              }
-                              className="w-10 h-10 p-0 hover:bg-gray-100 rounded-lg"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-
-                          {/* Subtotal and Remove */}
-                          <div className="flex items-center gap-4">
-                            <span className="font-bold text-blue-600 text-xl">
+                          <div className="text-left">
+                            <div className="font-bold text-amber-600 text-xl">
                               ${(item.product.price * item.quantity).toFixed(2)}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeFromCart(item.product.id)}
-                              className="w-10 h-10 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            </div>
+                            <div className="text-sm text-gray-500 mt-1">
+                              {item.quantity} × ${item.product.price.toFixed(2)}{" "}
+                              each
+                            </div>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFromCart(item.product.id)}
+                            className="w-10 h-10 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -190,14 +207,14 @@ const Cart = () => {
                       onClick={() => setPaymentMethod(method)}
                       className={`w-full flex items-center gap-4 p-4 border-2 rounded-xl transition-all font-medium ${
                         paymentMethod === method
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          ? "border-amber-500 bg-amber-50 text-amber-700"
                           : "border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
                     >
                       <Icon className="h-6 w-6" />
                       <span className="flex-1 text-left">{label}</span>
                       {paymentMethod === method && (
-                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
                       )}
                     </button>
                   ))}
@@ -213,7 +230,7 @@ const Cart = () => {
                   </div>
                   <div className="flex justify-between items-center text-2xl font-bold text-gray-900">
                     <span>Total Amount</span>
-                    <span className="text-blue-600">
+                    <span className="text-amber-600">
                       ${totalAmount.toFixed(2)}
                     </span>
                   </div>
@@ -226,7 +243,7 @@ const Cart = () => {
                   className={`w-full py-5 text-lg font-bold rounded-xl transition-all ${
                     !paymentMethod
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      : "bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   }`}
                 >
                   {!paymentMethod ? (

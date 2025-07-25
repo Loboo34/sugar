@@ -5,6 +5,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  updateStock
 } from "../controllers/product.controller";
 import {
   schemas,
@@ -30,6 +31,8 @@ router.put(
   validateWithFile(schemas.updateProduct, false),
   updateProduct
 );
+router.patch("/:id/stock", updateStock);
 router.delete("/:id", deleteProduct);
+
 
 export default router;

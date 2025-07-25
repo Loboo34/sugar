@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Item, Order, Product, User } from "../types";
 const ApiUrl = import.meta.env.VITE_API_URL;
-type Neworder = Omit<Order, "id"> 
+type Neworder = Omit<Order, "id">;
 
 export const api = axios.create({
   baseURL: ApiUrl,
@@ -80,15 +80,15 @@ export const getProducts = async () => {
   }
 };
 export const getProduct = async (id: string) => {
-    try{
-        const response = await api.get(`/products/${id}`);
-        return response.data;
-    } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-            throw error.response?.data || error.message;
-        }
-        throw error;
+  try {
+    const response = await api.get(`/products/${id}`);
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || error.message;
     }
+    throw error;
+  }
 };
 export const addProduct = async (productData: FormData) => {
   try {
@@ -97,7 +97,7 @@ export const addProduct = async (productData: FormData) => {
         "Content-Type": undefined,
       },
     });
-    
+
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -121,6 +121,19 @@ export const updateProduct = async (id: string, productData: FormData) => {
     throw error;
   }
 };
+
+export const updateProductStock = async (id: string, stock: number) => {
+  try {
+    const response = await api.patch(`/products/${id}/stock`, { stock });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || error.message;
+    }
+    throw error;
+  }
+};
+
 export const deleteProduct = async (id: string) => {
   try {
     const response = await api.delete(`/products/${id}`);
@@ -247,7 +260,23 @@ export const deleteStoreItem = async (id: string) => {
     throw error;
   }
 };
-export const transferStoreItem = async (id: string, transferData: { quantity: number; destination: string }) => {
+
+export const updateStoreItemQuantity = async (id: string, quantity: number) => {
+  try {
+    const response = await api.patch(`/stores/${id}/quantity`, { quantity });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || error.message;
+    }
+    throw error;
+  }
+};
+
+export const transferStoreItem = async (
+  id: string,
+  transferData: { quantity: number; destination: string }
+) => {
   try {
     const response = await api.post(`/stores/${id}/transfer`, transferData);
     return response.data;
@@ -304,4 +333,3 @@ export const getTotalSalesForProduct = async (productId: string) => {
     throw error;
   }
 };
-

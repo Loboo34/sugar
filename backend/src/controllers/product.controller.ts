@@ -183,6 +183,38 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
+export const updateStock = async(req: Request, res: Response) => {
+  const productId = req.params.id;
+  const { stock } = req.body;
+  logger.info(`Updating stock for product: ${productId}`);
+  if (!productId || stock === undefined) {
+    res.status(400).json({ message: "Product ID and stock are required" });
+    return;
+  }
+  try {
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { stock },
+      { new: true }
+    );
+    if (!product) {
+      res.status(404).json({ message: "Product not found" });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      message: "Stock updated successfully",
+      product,
+    });
+    logger.info("Stock updated successfully", product);
+  } catch (error: any) {
+    logger.error(`Error updating stock: ${error.message}`);
+    res
+      .status(500)
+      .json({ message: "Error updating stock", error: error.message });
+  }
+}
+
 export const deleteProduct = async (req: Request, res: Response) => {
   const productId = req.params.id;
   logger.info(`Deleting product: ${productId}`);

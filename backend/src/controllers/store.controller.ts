@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Store from "../models/store.model";
-import{ logger} from "../config/logger";
+import { logger } from "../config/logger";
 
 export const createStoreItem = async (req: Request, res: Response) => {
   const { itemName, quantity, unit } = req.body;
@@ -39,10 +39,10 @@ export const getStoreItems = async (req: Request, res: Response) => {
   try {
     const items = await Store.find();
     logger.info("Store items fetched successfully:", items);
-    res.status(200).json(items)
+    res.status(200).json(items);
   } catch (error: any) {
     logger.error(`Error fetching store items: ${error.message}`);
-    res.status(500).json(error)
+    res.status(500).json(error);
   }
 };
 
@@ -67,16 +67,16 @@ export const getStoreItem = async (req: Request, res: Response) => {
       message: "Internal server error",
     });
   }
-}
+};
 
 export const updateStoreItem = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { ItemName, quantity, quantityType } = req.body;
+  const { itemName, quantity, unit } = req.body;
   logger.info(`Updating store item with ID: ${id}`, { reqBody: req.body });
   try {
     const updatedItem = await Store.findByIdAndUpdate(
       id,
-      { ItemName, quantity, quantityType },
+      { itemName, quantity, unit },
       { new: true }
     );
 
@@ -95,6 +95,41 @@ export const updateStoreItem = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     logger.error(`Error updating store item: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const updateStoreItemQuantity = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+  logger.info(`Updating store item quantity with ID: ${id}`, {
+    newQuantity: quantity,
+  });
+
+  try {
+    const item = await Store.findById(id);
+
+    if (!item) {
+      logger.error(`Store item with ID ${id} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "Store item not found",
+      });
+    }
+
+    item.quantity = quantity;
+    const updatedItem = await item.save();
+
+    logger.info("Store item quantity updated successfully:", updatedItem);
+    res.status(200).json({
+      success: true,
+      data: updatedItem,
+    });
+  } catch (error: any) {
+    logger.error(`Error updating store item quantity: ${error.message}`);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -134,7 +169,9 @@ export const deleteStoreItem = async (req: Request, res: Response) => {
 export const transferStoreItem = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { quantity } = req.body;
-  logger.info(`Transferring ${quantity} of store item with ID: ${id} to kitchen`);
+  logger.info(
+    `Transferring ${quantity} of store item with ID: ${id} to kitchen`
+  );
   try {
     const item = await Store.findById(id);
     if (!item) {
@@ -146,7 +183,9 @@ export const transferStoreItem = async (req: Request, res: Response) => {
     }
 
     if (item.quantity < quantity) {
-      logger.warn(`Insufficient quantity for transfer. Available: ${item.quantity}, Requested: ${quantity}`);
+      logger.warn(
+        `Insufficient quantity for transfer. Available: ${item.quantity}, Requested: ${quantity}`
+      );
       return res.status(400).json({
         success: false,
         message: "Insufficient quantity for transfer",
@@ -156,7 +195,9 @@ export const transferStoreItem = async (req: Request, res: Response) => {
     item.quantity -= quantity;
     await item.save();
 
-    logger.info(`Transferred ${quantity} of store item with ID ${id} to kitchen successfully`);
+    logger.info(
+      `Transferred ${quantity} of store item with ID ${id} to kitchen successfully`
+    );
     res.status(200).json({
       success: true,
       message: `Transferred ${quantity} of store item to kitchen successfully`,

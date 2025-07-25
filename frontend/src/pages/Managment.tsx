@@ -56,18 +56,17 @@ export const Management = () => {
 };
 
 const ProductManagement: React.FC = () => {
-  const {
-    products,
-    removeProduct,
-    fetchProducts,
-    fetchProduct,
-    isLoading,
-  } = useProductStore();
+  const { products, removeProduct, fetchProducts, updateStock, isLoading } =
+    useProductStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [editProduct, setEditProduct] = useState<Product | null>(null)
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+
+  const [stockUpdates, setStockUpdates] = useState<{ [id: string]: number }>(
+    {}
+  );
 
   useEffect(() => {
     fetchProducts();
@@ -79,16 +78,13 @@ const ProductManagement: React.FC = () => {
 
   const handleDelete = useCallback(
     async (id: string, e?: React.MouseEvent) => {
-   
       if (e) {
         e.stopPropagation();
         e.preventDefault();
       }
 
-   
       if (!id || deletingId) return;
 
-      // Confirm deletion
       if (
         !window.confirm(
           "Are you sure you want to delete this product? This action cannot be undone."
@@ -115,6 +111,33 @@ const ProductManagement: React.FC = () => {
     [removeProduct, fetchProducts, deletingId]
   );
 
+  // Handler for inline stock change
+  const handleStockInput = (id: string, value: number) => {
+    setStockUpdates((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  // Handler to save all stock updates
+  const handleSaveStocks = async () => {
+    try {
+      // Update all changed stocks
+      const updatePromises = Object.entries(stockUpdates).map(([id, stock]) =>
+        updateStock(id, stock)
+      );
+
+      await Promise.all(updatePromises);
+      setStockUpdates({});
+      await fetchProducts();
+
+      // Show success message
+      alert("Stock updates saved successfully!");
+    } catch (error) {
+      console.error("Error saving stock updates:", error);
+      alert("Failed to save stock updates. Please try again.");
+    }
+  };
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -174,7 +197,128 @@ const ProductManagement: React.FC = () => {
 
       {isOpen && <AddProduct onClose={toggleModal} />}
 
-      {/* Products Grid */}
+      {/*  Stock Update Table */}
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-amber-800">
+            Quick Stock Update
+          </h3>
+          {Object.keys(stockUpdates).length > 0 && (
+            <span className="text-sm text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
+              {Object.keys(stockUpdates).length} changes pending
+            </span>
+          )}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="py-2 text-left">Product</th>
+                <th className="py-2 text-left">Category</th>
+                <th className="py-2 text-left">Current Stock</th>
+                <th className="py-2 text-left">Update Stock</th>
+                <th className="py-2 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map((product) => {
+                const hasChanges = stockUpdates[product.id] !== undefined;
+                const newStock = stockUpdates[product.id] ?? product.stock;
+                return (
+                  <tr
+                    key={product.id}
+                    className={`border-b last:border-none ${
+                      hasChanges ? "bg-amber-50" : ""
+                    }`}
+                  >
+                    <td className="py-2 font-medium">{product.name}</td>
+                    <td className="py-2">
+                      <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                        {product.category}
+                      </span>
+                    </td>
+                    <td className="py-2">
+                      <span
+                        className={`font-medium ${
+                          product.stock <= 5 ? "text-red-600" : "text-gray-900"
+                        }`}
+                      >
+                        {product.stock}
+                      </span>
+                    </td>
+                    <td className="py-2">
+                      <input
+                        type="number"
+                        min={0}
+                        value={newStock}
+                        onChange={(e) =>
+                          handleStockInput(product.id, Number(e.target.value))
+                        }
+                        className={`border rounded px-2 py-1 w-20 focus:ring-2 focus:ring-amber-500 ${
+                          hasChanges
+                            ? "border-amber-400 bg-amber-50"
+                            : "border-gray-300"
+                        }`}
+                      />
+                    </td>
+                    <td className="py-2">
+                      {hasChanges ? (
+                        <span className="text-xs text-amber-600 font-medium">
+                          Modified
+                        </span>
+                      ) : newStock <= 5 ? (
+                        <span className="text-xs text-red-600 font-medium">
+                          Low Stock
+                        </span>
+                      ) : (
+                        <span className="text-xs text-green-600 font-medium">
+                          OK
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-gray-600">
+            {Object.keys(stockUpdates).length > 0 ? (
+              <span>
+                Click "Save All" to apply {Object.keys(stockUpdates).length}{" "}
+                changes
+              </span>
+            ) : (
+              <span>Make changes to stock quantities above</span>
+            )}
+          </div>
+          <div className="flex gap-2">
+            {Object.keys(stockUpdates).length > 0 && (
+              <Button
+                onClick={() => setStockUpdates({})}
+                variant="outline"
+                className="text-gray-600 border-gray-300 hover:bg-gray-50"
+              >
+                Reset Changes
+              </Button>
+            )}
+            <Button
+              onClick={handleSaveStocks}
+              disabled={Object.keys(stockUpdates).length === 0}
+              className={`px-6 py-2 rounded-lg font-medium ${
+                Object.keys(stockUpdates).length > 0
+                  ? "bg-amber-600 hover:bg-amber-700 text-white"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Save All Stock Updates
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Products Table */}
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
@@ -192,98 +336,127 @@ const ProductManagement: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Product Image */}
-              <div className="h-48 bg-gray-100 relative">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "/api/placeholder/300/200";
-                  }}
-                />
-                <div className="absolute top-2 right-2">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      product.stock > 0
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {product.stock > 0 ? "In Stock" : "Out of Stock"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {product.name}
-                  </h3>
-                  <span className="text-lg font-bold text-amber-600">
-                    KSH {product.price.toFixed(2)}
-                  </span>
-                </div>
-
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {product.description}
-                </p>
-
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                    {product.category}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Stock: {product.stock}
-                  </span>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-amber-600 border-amber-600 hover:bg-amber-50"
-                    onClick={() => {
-                      setEditProduct(product);
-                      setIsOpen(true);
-                    }}
-                  >
-                    <Edit2 className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-red-600 border-red-600 hover:bg-red-50"
-                    onClick={() => handleDelete(product.id)}
-                    disabled={deletingId === product.id}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    {deletingId === product.id ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-                {isOpen && (
-                  <AddProduct
-                    onClose={() => {
-                      setIsOpen(false);
-                      setEditProduct(null);
-                    }}
-                    product={editProduct}
-                  />
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-amber-50 border-b border-amber-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Product
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Stock
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredProducts.map((product) => (
+                  <tr key={product.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-12 w-12">
+                          <img
+                            className="h-12 w-12 rounded-lg object-cover"
+                            src={product.image}
+                            alt={product.name}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "/api/placeholder/48/48";
+                            }}
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {product.name}
+                          </div>
+                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                            {product.description}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
+                        {product.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        KSH {product.price.toFixed(2)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div
+                        className={`text-sm font-medium ${
+                          product.stock <= 5 ? "text-red-600" : "text-gray-900"
+                        }`}
+                      >
+                        {product.stock}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          product.stock > 0
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                          onClick={() => {
+                            setEditProduct(product);
+                            setIsOpen(true);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          onClick={() => handleDelete(product.id)}
+                          disabled={deletingId === product.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+      )}
+
+      {isOpen && (
+        <AddProduct
+          onClose={() => {
+            setIsOpen(false);
+            setEditProduct(null);
+          }}
+          product={editProduct}
+        />
       )}
 
       {/* Stats */}
@@ -312,11 +485,18 @@ const ProductManagement: React.FC = () => {
 };
 
 const ItemsManagement: React.FC = () => {
-  const { items, fetchItems, removeItem, isLoading } = useInventoryStore();
+  const { items, fetchItems, removeItem, isLoading, updateQuantity } =
+    useInventoryStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [update, setUpdate] = useState<Item | null>(null)
+  const [update, setUpdate] = useState<Item | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [quantityUpdates, setQuantityUpdates] = useState<{
+    [id: string]: number;
+  }>({});
+  const [updatingQuantity, setUpdatingQuantity] = useState<{
+    [id: string]: boolean;
+  }>({});
 
   useEffect(() => {
     fetchItems();
@@ -326,10 +506,35 @@ const ItemsManagement: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+    setQuantityUpdates((prev) => ({
+      ...prev,
+      [itemId]: newQuantity,
+    }));
+  };
+
+  const handleQuantityUpdate = async (itemId: string) => {
+    const newQuantity = quantityUpdates[itemId];
+    if (newQuantity === undefined || newQuantity < 0) return;
+
+    try {
+      setUpdatingQuantity((prev) => ({ ...prev, [itemId]: true }));
+      await updateQuantity(itemId, newQuantity);
+      setQuantityUpdates((prev) => {
+        const updated = { ...prev };
+        delete updated[itemId];
+        return updated;
+      });
+    } catch (error) {
+      console.error("Error updating item quantity:", error);
+    } finally {
+      setUpdatingQuantity((prev) => ({ ...prev, [itemId]: false }));
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!id || deletingId) return;
 
-    // Confirm deletion
     if (
       !window.confirm(
         "Are you sure you want to delete this item? This action cannot be undone."
@@ -352,7 +557,6 @@ const ItemsManagement: React.FC = () => {
     } finally {
       setDeletingId(null);
     }
-    
   };
 
   const safeItems = Array.isArray(items) ? items : [];
@@ -395,7 +599,7 @@ const ItemsManagement: React.FC = () => {
 
       {isOpen && <AddItem onClose={toggleModal} />}
 
-      {/* Items Grid */}
+      {/* Items Table */}
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
@@ -413,104 +617,126 @@ const ItemsManagement: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Item Header */}
-              <div className="h-16 bg-gradient-to-r from-amber-100 to-amber-200 flex items-center justify-center relative">
-                <Package className="h-8 w-8 text-amber-600" />
-                <div className="absolute top-2 right-2">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      item.quantity > 0
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {item.quantity > 0 ? "Available" : "Out of Stock"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Item Info */}
-              <div className="p-4">
-                <div className="mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {item.itemName}
-                  </h3>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Quantity:</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {item.quantity} {item.unit}
-                    </span>
-                  </div>
-                  {/* {item.minimumStock && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Min Stock:</span>
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-amber-50 border-b border-amber-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Item Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Quantity
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Unit
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 bg-gradient-to-r from-amber-100 to-amber-200 rounded-lg flex items-center justify-center">
+                            <Package className="h-5 w-5 text-amber-600" />
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {item.itemName}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                          value={quantityUpdates[item.id] ?? item.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              item.id,
+                              parseInt(e.target.value) || 0
+                            )
+                          }
+                        />
+                        {quantityUpdates[item.id] !== undefined && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="px-2 py-1 text-xs text-amber-600 border-amber-600 hover:bg-amber-50"
+                            onClick={() => handleQuantityUpdate(item.id)}
+                            disabled={updatingQuantity[item.id]}
+                          >
+                            {updatingQuantity[item.id] ? "Saving..." : "Save"}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{item.unit}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`text-sm font-medium ${
-                          item.quantity <= item.minimumStock
-                            ? "text-red-600"
-                            : "text-gray-900"
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          item.quantity > 0
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {item.minimumStock} {item.unit}
+                        {item.quantity > 0 ? "Available" : "Out of Stock"}
                       </span>
-                    </div>
-                  )} */}
-                </div>
-
-                {/* Low Stock Warning */}
-                {/* {item.minimumStock && item.quantity <= item.minimumStock && (
-                  <div className="mb-4 p-2 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-xs text-red-700 font-medium">
-                      ⚠️ Low stock alert
-                    </p>
-                  </div>
-                )} */}
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-amber-600 border-amber-600 hover:bg-amber-50"
-                    onClick={() => {
-                      setUpdate(item);
-                      setIsOpen(true);
-                    }}
-                  >
-                    <Edit2 className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-red-600 border-red-600 hover:bg-red-50"
-                    onClick={() => handleDelete(item.id)}
-                    disabled={deletingId === item.id}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
-                  </Button>
-                </div>
-                {isOpen && (
-                  <AddItem onClose={() => {
-                    setIsOpen(false);
-                    setUpdate(null);
-                  }}
-                  item={update} />
-                )}
-              </div>
-            </div>
-          ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                          onClick={() => {
+                            setUpdate(item);
+                            setIsOpen(true);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          onClick={() => handleDelete(item.id)}
+                          disabled={deletingId === item.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+      )}
+
+      {isOpen && (
+        <AddItem
+          onClose={() => {
+            setIsOpen(false);
+            setUpdate(null);
+          }}
+          item={update}
+        />
       )}
 
       {/* Stats */}

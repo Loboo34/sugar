@@ -9,52 +9,52 @@ const SalesTerminal = () => {
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-amber-50">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header Section - More Spacious */}
+        {/* Header Section  */}
         <div className="mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div>
-              <h1 className="text-5xl font-bold text-gray-900 mb-4 flex items-center gap-4">
-                <div className="p-3 bg-blue-600 rounded-2xl">
+              <h1 className="text-5xl font-bold text-amber-800 mb-4 flex items-center gap-4">
+                <div className="p-3 bg-amber-600 rounded-2xl">
                   <Package className="h-10 w-10 text-white" />
                 </div>
                 Sales Terminal
               </h1>
-              <p className="text-xl text-gray-600 max-w-2xl">
+              <p className="text-xl text-amber-600 max-w-2xl">
                 Select products to build your order. Changes are saved
                 automatically.
               </p>
             </div>
 
-            {/* Clean Stats Cards */}
+            {/* Stats Cards */}
             <div className="flex flex-col sm:flex-row gap-6">
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 min-w-[160px]">
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-amber-200 min-w-[160px]">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-50 rounded-xl">
-                    <ShoppingCart className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-amber-50 rounded-xl">
+                    <ShoppingCart className="h-6 w-6 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">
+                    <p className="text-sm font-medium text-amber-600 mb-1">
                       Cart Items
                     </p>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <p className="text-3xl font-bold text-amber-800">
                       {itemCount}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 min-w-[160px]">
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-amber-200 min-w-[160px]">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-green-50 rounded-xl">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  <div className="p-3 bg-amber-50 rounded-xl">
+                    <TrendingUp className="h-6 w-6 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">
+                    <p className="text-sm font-medium text-amber-600 mb-1">
                       Total
                     </p>
-                    <p className="text-3xl font-bold text-green-600">
+                    <p className="text-3xl font-bold text-amber-800">
                       ${totalAmount.toFixed(2)}
                     </p>
                   </div>
@@ -64,9 +64,9 @@ const SalesTerminal = () => {
           </div>
         </div>
 
-        {/* Main Content - Better Spacing */}
+        {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Products Section - More Space */}
+          {/* Products Section */}
           <div className="xl:col-span-2">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="p-8 bg-gradient-to-r from-blue-600 to-indigo-600">
@@ -83,7 +83,7 @@ const SalesTerminal = () => {
             </div>
           </div>
 
-          {/* Sidebar - Cleaner Layout */}
+          {/* Sidebar  */}
           <div className="xl:col-span-1">
             <div className="space-y-8 sticky top-8">
               <Cart />

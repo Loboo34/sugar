@@ -32,7 +32,7 @@ const App = () => {
           <main className="flex-1">
             <Routes>
               <Route path="/management" element={<Management />} />
-              <Route path="/sales" element={<SalesTerminal />} />
+              <Route path="/" element={<SalesTerminal />} />
               <Route path="/reports" element={<Reports />} />
               {/* <Route path="/" element={<Navigate to="/sales" replace />} />
               <Route path="/sales" element={<SalesTerminal />} />
