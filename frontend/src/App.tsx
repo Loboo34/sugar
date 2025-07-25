@@ -7,20 +7,25 @@ import Login from "./pages/Login";
 import { Management } from "./pages/Managment";
 import SalesTerminal from "./pages/SalesTerminal";
 import Reports from "./pages/Reports";
+import { Transfer } from "./pages/Transfer";
 
 const App = () => {
-  const {user, isLoading, getProfile} = useAuthStore();
+  const { user, isLoading, getProfile } = useAuthStore();
   React.useEffect(() => {
     if (!user) {
       getProfile();
     }
   }, [user, getProfile]);
 
-  if(isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
-  if(!user) {
+  if (!user) {
     return <Login />;
   }
   return (
@@ -33,6 +38,7 @@ const App = () => {
             <Routes>
               <Route path="/management" element={<Management />} />
               <Route path="/" element={<SalesTerminal />} />
+              <Route path="/transfers" element={<Transfer />} />
               <Route path="/reports" element={<Reports />} />
               {/* <Route path="/" element={<Navigate to="/sales" replace />} />
               <Route path="/sales" element={<SalesTerminal />} />

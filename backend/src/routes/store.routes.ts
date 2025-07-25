@@ -8,11 +8,13 @@ import {
   updateStoreItemQuantity,
   deleteStoreItem,
   transferStoreItem,
+  getRecentTransfers,
 } from "../controllers/store.controller";
 
 const router = Router();
 
 router.get("/", getStoreItems);
+router.get("/transfers/recent", getRecentTransfers);
 router.get("/:id", getStoreItem);
 
 router.post("/", validate(schemas.createStoreItem), createStoreItem);

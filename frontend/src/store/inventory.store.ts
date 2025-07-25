@@ -8,6 +8,7 @@ import {
   getStoreItems,
   updateStoreItem,
   updateStoreItemQuantity,
+  transferStoreItem,
 } from "../services/api";
 
 interface InventoryStore {
@@ -19,6 +20,7 @@ interface InventoryStore {
   removeItem: (id: string) => void;
   fetchItems: () => Promise<void>;
   fetchItem: (id: string) => Promise<Item | null>;
+  transferItem: (id: string, transferData: { quantity: number; destination: string }) => Promise<void>;
 }
 
 export const useInventoryStore = create<InventoryStore>()(
@@ -106,7 +108,18 @@ export const useInventoryStore = create<InventoryStore>()(
           return null;
         }
       },
+      transferItem: async (id: string, transferData: { quantity: number; destination: string }) => {
+        try {
+          set({ isLoading: true });
+          await transferStoreItem(id, transferData);
+          set({ isLoading: false });
+        } catch (error) {
+          console.error("Error transferring item:", error);
+          set({ isLoading: false });
+        }
+      },
     }),
+
     { name: "inventory-store" }
   )
 );

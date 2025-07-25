@@ -288,6 +288,18 @@ export const transferStoreItem = async (
   }
 };
 
+export const getRecentTransfers = async () => {
+  try {
+    const response = await api.get("/stores/transfers/recent");
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || error.message;
+    }
+    throw error;
+  }
+};
+
 //sales service
 export const getExpenses = async () => {
   try {

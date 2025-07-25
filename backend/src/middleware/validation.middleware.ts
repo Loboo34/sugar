@@ -124,7 +124,7 @@ export const schemas = {
     }),
     transferStoreItem: Joi.object({
         quantity: Joi.number().min(1).required(),
-        //destination: Joi.string().required()
+        destination: Joi.string().required()
     }),
     register: Joi.object({
         email: Joi.string().email().required(),
