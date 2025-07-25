@@ -16,24 +16,26 @@ export const Management = () => {
   ];
   return (
     <div className="min-h-screen bg-amber-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-amber-800 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-amber-800 mb-2">
             Admin Dashboard
           </h1>
-          <p className="text-amber-600">Manage products and ingredients</p>
+          <p className="text-amber-600 text-sm sm:text-base">
+            Manage products and ingredients
+          </p>
         </div>
 
         <div className="mb-6">
           <div className="border-b border-amber-200">
-            <nav className="-mb-px flex space-x-8">
+            <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                    className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 whitespace-nowrap ${
                       activeTab === tab.id
                         ? "border-amber-500 text-amber-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -199,22 +201,24 @@ const ProductManagement: React.FC = () => {
 
       {/*  Stock Update Table */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
           <h3 className="text-lg font-semibold text-amber-800">
             Quick Stock Update
           </h3>
           {Object.keys(stockUpdates).length > 0 && (
-            <span className="text-sm text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
+            <span className="text-sm text-amber-600 bg-amber-100 px-2 py-1 rounded-full self-start sm:self-auto">
               {Object.keys(stockUpdates).length} changes pending
             </span>
           )}
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="border-b">
                 <th className="py-2 text-left">Product</th>
-                <th className="py-2 text-left">Category</th>
+                <th className="py-2 text-left hidden sm:table-cell">
+                  Category
+                </th>
                 <th className="py-2 text-left">Current Stock</th>
                 <th className="py-2 text-left">Update Stock</th>
                 <th className="py-2 text-left">Status</th>
@@ -231,8 +235,16 @@ const ProductManagement: React.FC = () => {
                       hasChanges ? "bg-amber-50" : ""
                     }`}
                   >
-                    <td className="py-2 font-medium">{product.name}</td>
-                    <td className="py-2">
+                    <td className="py-2 font-medium truncate max-w-[120px] sm:max-w-none">
+                      {product.name}
+                      {/* Mobile category display */}
+                      <div className="sm:hidden mt-1">
+                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                          {product.category}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2 hidden sm:table-cell">
                       <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
                         {product.category}
                       </span>
@@ -254,7 +266,7 @@ const ProductManagement: React.FC = () => {
                         onChange={(e) =>
                           handleStockInput(product.id, Number(e.target.value))
                         }
-                        className={`border rounded px-2 py-1 w-20 focus:ring-2 focus:ring-amber-500 ${
+                        className={`border rounded px-2 py-1 w-16 sm:w-20 focus:ring-2 focus:ring-amber-500 text-sm ${
                           hasChanges
                             ? "border-amber-400 bg-amber-50"
                             : "border-gray-300"
@@ -282,7 +294,7 @@ const ProductManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-4">
           <div className="text-sm text-gray-600">
             {Object.keys(stockUpdates).length > 0 ? (
               <span>
@@ -293,7 +305,7 @@ const ProductManagement: React.FC = () => {
               <span>Make changes to stock quantities above</span>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {Object.keys(stockUpdates).length > 0 && (
               <Button
                 onClick={() => setStockUpdates({})}
@@ -306,7 +318,7 @@ const ProductManagement: React.FC = () => {
             <Button
               onClick={handleSaveStocks}
               disabled={Object.keys(stockUpdates).length === 0}
-              className={`px-6 py-2 rounded-lg font-medium ${
+              className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-sm ${
                 Object.keys(stockUpdates).length > 0
                   ? "bg-amber-600 hover:bg-amber-700 text-white"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -338,25 +350,25 @@ const ProductManagement: React.FC = () => {
       ) : (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[700px]">
               <thead className="bg-amber-50 border-b border-amber-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider hidden sm:table-cell">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Stock
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider hidden md:table-cell">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -364,11 +376,11 @@ const ProductManagement: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-12 w-12">
+                        <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12">
                           <img
-                            className="h-12 w-12 rounded-lg object-cover"
+                            className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg object-cover"
                             src={product.image}
                             alt={product.name}
                             onError={(e) => {
@@ -377,27 +389,33 @@ const ProductManagement: React.FC = () => {
                             }}
                           />
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                        <div className="ml-2 sm:ml-4">
+                          <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">
                             {product.name}
                           </div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                          <div className="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-xs">
                             {product.description}
+                          </div>
+                          {/* Mobile category display */}
+                          <div className="sm:hidden mt-1">
+                            <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
+                              {product.category}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                       <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
                         {product.category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         KSH {product.price.toFixed(2)}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                       <div
                         className={`text-sm font-medium ${
                           product.stock <= 5 ? "text-red-600" : "text-gray-900"
@@ -405,8 +423,20 @@ const ProductManagement: React.FC = () => {
                       >
                         {product.stock}
                       </div>
+                      {/* Mobile status display */}
+                      <div className="md:hidden mt-1">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            product.stock > 0
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           product.stock > 0
@@ -417,27 +447,27 @@ const ProductManagement: React.FC = () => {
                         {product.stock > 0 ? "In Stock" : "Out of Stock"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-1 sm:space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                          className="text-amber-600 border-amber-600 hover:bg-amber-50 p-1 sm:p-2"
                           onClick={() => {
                             setEditProduct(product);
                             setIsOpen(true);
                           }}
                         >
-                          <Edit2 className="h-4 w-4" />
+                          <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          className="text-red-600 border-red-600 hover:bg-red-50 p-1 sm:p-2"
                           onClick={() => handleDelete(product.id)}
                           disabled={deletingId === product.id}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </td>
@@ -619,22 +649,22 @@ const ItemsManagement: React.FC = () => {
       ) : (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-amber-50 border-b border-amber-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Item Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Quantity
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider hidden sm:table-cell">
                     Unit
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider hidden md:table-cell">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -642,26 +672,30 @@ const ItemsManagement: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredItems.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 bg-gradient-to-r from-amber-100 to-amber-200 rounded-lg flex items-center justify-center">
-                            <Package className="h-5 w-5 text-amber-600" />
+                        <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-r from-amber-100 to-amber-200 rounded-lg flex items-center justify-center">
+                            <Package className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                           </div>
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-2 sm:ml-4">
                           <div className="text-sm font-medium text-gray-900">
                             {item.itemName}
+                          </div>
+                          {/* Mobile unit display */}
+                          <div className="sm:hidden text-xs text-gray-500 mt-1">
+                            Unit: {item.unit}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
                         <input
                           type="number"
                           min="0"
-                          className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                          className="w-16 sm:w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                           value={quantityUpdates[item.id] ?? item.quantity}
                           onChange={(e) =>
                             handleQuantityChange(
@@ -678,15 +712,27 @@ const ItemsManagement: React.FC = () => {
                             onClick={() => handleQuantityUpdate(item.id)}
                             disabled={updatingQuantity[item.id]}
                           >
-                            {updatingQuantity[item.id] ? "Saving..." : "Save"}
+                            {updatingQuantity[item.id] ? "..." : "Save"}
                           </Button>
                         )}
                       </div>
+                      {/* Mobile status display */}
+                      <div className="md:hidden mt-1">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            item.quantity > 0
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {item.quantity > 0 ? "Available" : "Out of Stock"}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                       <div className="text-sm text-gray-500">{item.unit}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           item.quantity > 0
@@ -697,27 +743,27 @@ const ItemsManagement: React.FC = () => {
                         {item.quantity > 0 ? "Available" : "Out of Stock"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-1 sm:space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                          className="text-amber-600 border-amber-600 hover:bg-amber-50 p-1 sm:p-2"
                           onClick={() => {
                             setUpdate(item);
                             setIsOpen(true);
                           }}
                         >
-                          <Edit2 className="h-4 w-4" />
+                          <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          className="text-red-600 border-red-600 hover:bg-red-50 p-1 sm:p-2"
                           onClick={() => handleDelete(item.id)}
                           disabled={deletingId === item.id}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </td>
@@ -740,27 +786,27 @@ const ItemsManagement: React.FC = () => {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-white p-6 rounded-lg shadow-sm">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white p-4 sm:p-6 rounded-lg shadow-sm">
         <div className="text-center">
-          <div className="text-2xl font-bold text-amber-600">
+          <div className="text-xl sm:text-2xl font-bold text-amber-600">
             {items.length}
           </div>
-          <div className="text-sm text-gray-600">Total Items</div>
+          <div className="text-xs sm:text-sm text-gray-600">Total Items</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-xl sm:text-2xl font-bold text-green-600">
             {safeItems.filter((item) => item.quantity > 0).length}
           </div>
-          <div className="text-sm text-gray-600">In Stock</div>
+          <div className="text-xs sm:text-sm text-gray-600">In Stock</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-red-600">
+          <div className="text-xl sm:text-2xl font-bold text-red-600">
             {safeItems.filter((item) => item.quantity === 0).length}
           </div>
-          <div className="text-sm text-gray-600">Out of Stock</div>
+          <div className="text-xs sm:text-sm text-gray-600">Out of Stock</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-600">
+          <div className="text-xl sm:text-2xl font-bold text-orange-600">
             {/* {
               items.filter(
                 (item) =>
@@ -768,7 +814,7 @@ const ItemsManagement: React.FC = () => {
               ).length
             } */}
           </div>
-          <div className="text-sm text-gray-600">Low Stock</div>
+          <div className="text-xs sm:text-sm text-gray-600">Low Stock</div>
         </div>
       </div>
     </div>

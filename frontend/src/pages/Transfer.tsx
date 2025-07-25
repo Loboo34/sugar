@@ -121,7 +121,6 @@ export const Transfer = () => {
         message: `Successfully transferred ${selectedItems.length} item(s)`,
       });
 
-      
       setSelectedItems([]);
       await fetchItems();
     } catch (error) {
@@ -145,12 +144,12 @@ export const Transfer = () => {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-amber-800 mb-2">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-amber-800 mb-2">
             Transfer Items
           </h1>
-          <p className="text-amber-600">
+          <p className="text-sm sm:text-base text-amber-600">
             Transfer items from store to kitchen or shop
           </p>
         </div>
@@ -174,14 +173,14 @@ export const Transfer = () => {
         )}
 
         {/* Search and Summary */}
-        <div className="mb-6 bg-white rounded-lg shadow-sm p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="mb-4 sm:mb-6 bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 gap-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
                 placeholder="Search items..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full pl-10 pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -189,8 +188,8 @@ export const Transfer = () => {
 
             {/* Transfer Summary */}
             {selectedItems.length > 0 && (
-              <div className="flex items-center gap-4">
-                <div className="text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="text-xs sm:text-sm text-gray-600">
                   <span className="font-medium">{getTotalItems()}</span>{" "}
                   selections,
                   <span className="font-medium ml-1">
@@ -203,7 +202,7 @@ export const Transfer = () => {
                     variant="outline"
                     size="sm"
                     onClick={clearAllSelections}
-                    className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                    className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs sm:text-sm"
                   >
                     Clear All
                   </Button>
@@ -211,7 +210,7 @@ export const Transfer = () => {
                     size="sm"
                     onClick={handleTransferAll}
                     disabled={transferring}
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                    className="bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm"
                   >
                     {transferring ? "Transferring..." : "Transfer All"}
                   </Button>
@@ -224,30 +223,30 @@ export const Transfer = () => {
         {/* Items Table */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-amber-50 border-b border-amber-200 sticky top-0">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-3 sm:px-4 py-2 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Item
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-2 sm:px-3 py-2 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
                     Available
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-amber-800 uppercase tracking-wider">
+                  <th className="px-2 sm:px-3 py-2 text-left text-xs font-medium text-amber-800 uppercase tracking-wider hidden sm:table-cell">
                     Unit
                   </th>
-                  <th className="px-3 py-2 text-center text-xs font-medium text-amber-800 uppercase tracking-wider">
-                    To Kitchen
+                  <th className="px-2 sm:px-3 py-2 text-center text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Kitchen
                   </th>
-                  <th className="px-3 py-2 text-center text-xs font-medium text-amber-800 uppercase tracking-wider">
-                    To Shop
+                  <th className="px-2 sm:px-3 py-2 text-center text-xs font-medium text-amber-800 uppercase tracking-wider">
+                    Shop
                   </th>
                 </tr>
               </thead>
             </table>
           </div>
-          <div className="max-h-[400px] overflow-y-auto">
-            <table className="w-full">
+          <div className="max-h-[400px] overflow-y-auto overflow-x-auto">
+            <table className="w-full min-w-[600px]">
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredItems.map((item) => {
                   const totalSelected = getTotalSelectedForItem(item.id);
@@ -295,17 +294,22 @@ export const Transfer = () => {
 
                   return (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-2">
-                        <div className="flex items-center gap-2">
-                          <Package className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                          <span className="font-medium text-sm truncate">
-                            {item.itemName}
-                          </span>
+                      <td className="px-3 sm:px-4 py-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <Package className="h-3 w-3 sm:h-4 sm:w-4 text-amber-600 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <span className="font-medium text-xs sm:text-sm truncate block">
+                              {item.itemName}
+                            </span>
+                            <span className="text-xs text-gray-500 sm:hidden">
+                              {item.unit}
+                            </span>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-2 sm:px-3 py-2">
                         <span
-                          className={`text-sm font-medium ${
+                          className={`text-xs sm:text-sm font-medium ${
                             remainingQuantity <= 5
                               ? "text-red-600"
                               : "text-gray-900"
@@ -314,13 +318,13 @@ export const Transfer = () => {
                           {remainingQuantity}
                         </span>
                       </td>
-                      <td className="px-3 py-2">
-                        <span className="text-sm text-gray-500">
+                      <td className="px-2 sm:px-3 py-2 hidden sm:table-cell">
+                        <span className="text-xs sm:text-sm text-gray-500">
                           {item.unit}
                         </span>
                       </td>
-                      <td className="px-3 py-2">
-                        <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-center justify-center">
+                      <td className="px-2 sm:px-3 py-2">
+                        <div className="flex flex-col gap-1 items-center justify-center">
                           <input
                             type="number"
                             min={0}
@@ -334,7 +338,7 @@ export const Transfer = () => {
                               )
                             }
                             disabled={item.quantity === 0}
-                            className="w-16 px-2 py-1 text-xs border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-12 sm:w-16 px-1 sm:px-2 py-1 text-xs border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="0"
                           />
                           <Button
@@ -345,14 +349,14 @@ export const Transfer = () => {
                               transferring
                             }
                             onClick={() => handleSingleTransfer("kitchen")}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 h-7"
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-1 sm:px-2 py-1 h-6 sm:h-7 w-full"
                           >
                             Transfer
                           </Button>
                         </div>
                       </td>
-                      <td className="px-3 py-2">
-                        <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-center justify-center">
+                      <td className="px-2 sm:px-3 py-2">
+                        <div className="flex flex-col gap-1 items-center justify-center">
                           <input
                             type="number"
                             min={0}
@@ -366,7 +370,7 @@ export const Transfer = () => {
                               )
                             }
                             disabled={item.quantity === 0}
-                            className="w-16 px-2 py-1 text-xs border border-gray-300 rounded text-center focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            className="w-12 sm:w-16 px-1 sm:px-2 py-1 text-xs border border-gray-300 rounded text-center focus:ring-2 focus:ring-green-500 focus:border-green-500"
                             placeholder="0"
                           />
                           <Button
@@ -377,7 +381,7 @@ export const Transfer = () => {
                               transferring
                             }
                             onClick={() => handleSingleTransfer("shop")}
-                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 h-7"
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-1 sm:px-2 py-1 h-6 sm:h-7 w-full"
                           >
                             Transfer
                           </Button>
@@ -413,38 +417,42 @@ export const Transfer = () => {
         )}
 
         {/* Recent Transfers Table */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">
+        <div className="mt-6 sm:mt-8 bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900">
               Recent Transfers
             </h3>
-            <p className="text-sm text-gray-500">Last 3 transfers made</p>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Last 3 transfers made
+            </p>
           </div>
 
           {loadingTransfers ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600"></div>
+            <div className="flex justify-center items-center py-6 sm:py-8">
+              <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-amber-600"></div>
             </div>
           ) : recentTransfers.length === 0 ? (
-            <div className="text-center py-8">
-              <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">No recent transfers</p>
+            <div className="text-center py-6 sm:py-8">
+              <Package className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-2 sm:mb-3" />
+              <p className="text-sm sm:text-base text-gray-500">
+                No recent transfers
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[500px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Item
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Quantity
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Destination
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                       When
                     </th>
                   </tr>
@@ -452,20 +460,20 @@ export const Transfer = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {recentTransfers.map((transfer) => (
                     <tr key={transfer._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <Package className="h-4 w-4 text-amber-600 mr-2" />
-                          <span className="text-sm font-medium text-gray-900">
+                          <Package className="h-3 w-3 sm:h-4 sm:w-4 text-amber-600 mr-1 sm:mr-2 flex-shrink-0" />
+                          <span className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                             {transfer.itemName}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                        <span className="text-xs sm:text-sm text-gray-900">
                           {transfer.quantity} {transfer.unit}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                             transfer.destination === "kitchen"
@@ -477,7 +485,7 @@ export const Transfer = () => {
                             transfer.destination.slice(1)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
                         {new Date(transfer.transferredAt).toLocaleString()}
                       </td>
                     </tr>

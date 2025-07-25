@@ -34,7 +34,7 @@ const App = () => {
         <Header />
         <div className="flex">
           <Navigation />
-          <main className="flex-1">
+          <main className="flex-1 lg:ml-0">
             <Routes>
               <Route path="/management" element={<Management />} />
               <Route path="/" element={<SalesTerminal />} />

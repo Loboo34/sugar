@@ -261,27 +261,27 @@ const Reports: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-amber-800 mb-2 flex items-center gap-3">
-              <TrendingUp className="h-10 w-10" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-800 mb-2 flex items-center gap-2 sm:gap-3">
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
               Sales Reports
             </h1>
-            <p className="text-amber-600 text-lg">
+            <p className="text-amber-600 text-sm sm:text-base lg:text-lg">
               Comprehensive overview of your bakery's performance
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
             {/* Timeframe Selector */}
             <div className="flex bg-white rounded-lg p-1 shadow-sm">
               {(["daily", "weekly", "monthly"] as const).map((timeframe) => (
                 <button
                   key={timeframe}
                   onClick={() => setSelectedTimeframe(timeframe)}
-                  className={`px-4 py-2 rounded-md font-medium capitalize transition-colors ${
+                  className={`px-3 sm:px-4 py-2 rounded-md font-medium capitalize transition-colors text-sm ${
                     selectedTimeframe === timeframe
                       ? "bg-amber-600 text-white"
                       : "text-amber-700 hover:bg-amber-50"
@@ -293,9 +293,9 @@ const Reports: React.FC = () => {
             </div>
 
             {/* Export Button */}
-            <button className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-amber-200 text-amber-700 hover:bg-amber-50">
+            <button className="flex items-center justify-center gap-2 bg-white px-3 sm:px-4 py-2 rounded-lg shadow-sm border border-amber-200 text-amber-700 hover:bg-amber-50 text-sm">
               <Download className="h-4 w-4" />
-              Export
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </div>
@@ -375,16 +375,16 @@ const Reports: React.FC = () => {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-10">
           {/* Product Sales Bar Chart */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800">
                 Revenue by Product
               </h2>
-              <Filter className="h-5 w-5 text-gray-400" />
+              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
             </div>
-            <div className="h-80">
+            <div className="h-64 sm:h-80">
               <Bar
                 data={productSalesBarData}
                 options={{
@@ -397,7 +397,7 @@ const Reports: React.FC = () => {
           </div>
 
           {/* Product Quantity Distribution */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100">
             <h2 className="text-xl font-bold text-gray-800 mb-6">
               Quantity Distribution
             </h2>
@@ -438,31 +438,31 @@ const Reports: React.FC = () => {
 
         {/* Product Performance Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-xl font-bold text-gray-800">
+          <div className="p-4 sm:p-6 border-b border-gray-100">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800">
               Product Performance
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Quantity Sold
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Revenue
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                     Orders
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                     Avg. per Order
                   </th>
                 </tr>
@@ -470,26 +470,32 @@ const Reports: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {productSales.map((product) => (
                   <tr key={product.productId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                      <div className="font-medium text-gray-900 text-sm">
                         {product.product?.name || "Unknown"}
                       </div>
+                      {/* Mobile category display */}
+                      <div className="sm:hidden mt-1">
+                        <span className="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">
+                          {product.product?.category || "N/A"}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                       <span className="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">
                         {product.product?.category || "N/A"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-gray-900 text-sm">
                       {product.totalQuantity.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap font-medium text-gray-900 text-sm">
                       KSH {product.totalAmount.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-gray-900 text-sm hidden md:table-cell">
                       {product.totalOrders}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-gray-900 text-sm hidden lg:table-cell">
                       {product.totalOrders > 0
                         ? (product.totalQuantity / product.totalOrders).toFixed(
                             1
