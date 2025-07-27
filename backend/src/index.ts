@@ -13,6 +13,7 @@ import storeRoutes from "./routes/store.routes";
 import orderRoutes from "./routes/order.routes";
 import salesRoutes from "./routes/sales.routes";
 import notificationRoutes from "./routes/notification.routes";
+import mpesaRoutes from "./routes/mpesa.routes";
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(`${apiVersion}/stores`, storeRoutes);
 app.use(`${apiVersion}/orders`, orderRoutes);
 app.use(`${apiVersion}/sales`, salesRoutes);
 app.use(`${apiVersion}/notifications`, notificationRoutes);
+app.use(`${apiVersion}/mpesa`, mpesaRoutes);
 
 const PORT = process.env.PORT || 3000;
 connectDB()

@@ -4,8 +4,8 @@ import { callBack } from "../services/callBack";
 
 const router = Router();
 
-router.post("/lipa-na-mpesa-online", mpesaController.lipaNaMpesaOnline);
+router.post("/lipanampesa", mpesaController.initiatePayment);
 router.post("/callback", callBack);
-
+router.get("/transactions", mpesaController.getTransactions);
 
 export default router;
