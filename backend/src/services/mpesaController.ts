@@ -12,58 +12,70 @@ const generateTimestamp = () => {
 const shortCode = 174379; // Example shortcode, replace with actual
 const PASS_KEY = process.env.PASS_KEY;
 
-export const mpesaController = {
-  async initiatePayment(req: Request, res: Response) {
-    try {
-      const { amount, phoneNumber, accountReference, transactionDesc } =
-        req.body;
-
-      if (!amount || !phoneNumber) {
-        return res
-          .status(400)
-          .json({ error: "Amount and phone number are required" });
-      }
-
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        return res
-          .status(500)
-          .json({ error: "Failed to retrieve access token" });
-      }
-      const timestamp = generateTimestamp();
-      const headers = {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      };
-
-      const payload = {
-        BusinessShortCode: shortCode,
-        Password: Buffer.from(`${shortCode}${PASS_KEY}${timestamp}`).toString(
-          "base64"
-        ),
-        Timestamp: timestamp,
-        TransactionType: "CustomerPayBillOnline",
-        Amount: amount,
-        PartyA: phoneNumber,
-        PartyB: shortCode,
-        PhoneNumber: phoneNumber,
-        CallBackURL: `${process.env.BASE_URL}/mpesa/callback`,
-        AccountReference: accountReference || "BakersApp",
-        TransactionDesc: transactionDesc || "Payment for goods/services",
-      };
-
-      const response = await axios.post(
-        "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-        payload,
-        { headers }
-      );
-
-      return res.status(200).json(response.data);
-    } catch (error) {
-      logger.error("Error initiating payment", error);
-      return res.status(500).json({ error: "Failed to initiate payment" });
+async function initiatePayment({
+  amount,
+  products,
+  phoneNumber,
+  accountReference,
+  transactionDesc,
+}: {
+  amount: number;
+  products?: any[];
+  phoneNumber: string;
+  accountReference?: string;
+  transactionDesc?: string;
+}) {
+  try {
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      logger.error("Failed to retrieve access token");
+      return;
     }
-  },
+
+    const timestamp = generateTimestamp();
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const payload = {
+      BusinessShortCode: shortCode,
+      Password: Buffer.from(`${shortCode}${PASS_KEY}${timestamp}`).toString(
+        "base64"
+      ),
+      Timestamp: timestamp,
+      TransactionType: "CustomerPayBillOnline",
+      Amount: amount,
+      PartyA: phoneNumber,
+      PartyB: shortCode,
+      PhoneNumber: phoneNumber,
+      CallBackURL: `${process.env.BASE_URL}/api/v1/mpesa/callback`,
+      AccountReference: accountReference || "BakersApp",
+      TransactionDesc: transactionDesc || "Payment for goods/services",
+      Metadata: products
+        ? products.map((product) => ({
+            ProductName: product.name,
+            Quantity: product.quantity,
+            Price: product.price,
+          }))
+        : [],
+    };
+
+    const response = await axios.post(
+      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+      payload,
+      { headers }
+    );
+
+    return response.data;
+  } catch (error) {
+    logger.error("Error initiating payment", error);
+    return { error: "Failed to initiate payment" };
+  }
+};
+
+export const mpesaController = {
+ initiatePayment,
   
   async getTransactions(req: Request, res: Response) {
     try {
@@ -75,3 +87,4 @@ export const mpesaController = {
     }
   },
 };
+
