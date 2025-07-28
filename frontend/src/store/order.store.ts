@@ -26,6 +26,7 @@ export const useOrderStore = create<OrderStore>()(
                         orders: [...state.orders, newOrder],
                         isLoading: false,
                     }));
+                    return newOrder;
                 } catch (error) {
                     console.error("Error creating order:", error);
                     set({ isLoading: false });

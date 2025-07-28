@@ -24,6 +24,7 @@ export interface Order {
   }[];
   totalAmount: number;
   paymentMethod: "cash" | "Mpesa";
+  phoneNumber? : string;
 }
 
 export interface User {
