@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Upload, Package, Image } from "lucide-react";
+import { X, Upload, Package } from "lucide-react";
 import { Button } from "./Button";
 import { useProductStore } from "../store/product.store";
 import type { Product } from "../types";

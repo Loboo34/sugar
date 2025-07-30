@@ -20,7 +20,9 @@ interface OrderStore {
   orders: Order[];
   paidOrders: Order[];
   isLoading: boolean;
-  makeOrder: (order: Neworder) => Promise<void>;
+  makeOrder: (
+    order: Neworder
+  ) => Promise<{ success: boolean; data: Order } | null>;
   fetchOrders: () => Promise<void>;
   fetchPaidOrders: () => Promise<void>;
   fetchOrder: (id: string) => Promise<Order | null>;

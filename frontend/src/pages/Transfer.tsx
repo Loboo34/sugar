@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
   Package,
-  ArrowRight,
+ // ArrowRight,
   Search,
   CheckCircle,
   AlertCircle,

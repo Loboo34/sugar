@@ -1,4 +1,4 @@
-import React from "react";
+
 import { LogOut, User, ShoppingBag } from "lucide-react";
 import { Button } from "./Button";
 import { useAuthStore } from "../store/auth.store";

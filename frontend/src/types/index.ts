@@ -17,6 +17,7 @@ export interface Item {
 
 export interface Order {
   id: string;
+  _id? : string;
   user: string;
   products: {
     product: Product;
@@ -34,6 +35,7 @@ export interface Order {
 
 export interface User {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   role: "admin" | "user";

@@ -14,11 +14,11 @@ import {
 } from "chart.js";
 import {
   TrendingUp,
-  TrendingDown,
+  //TrendingDown,
   DollarSign,
   ShoppingCart,
   Package,
-  Calendar,
+  //Calendar,
   Download,
   Filter,
 } from "lucide-react";
@@ -74,8 +74,8 @@ const Reports: React.FC = () => {
 
   // Use the sales store
   const {
-    totalSales,
-    salesByTimeframe,
+    //totalSales,
+    //salesByTimeframe,
     fetchTotalSales,
     fetchSalesByTimeframe,
   } = useSalesStore();
@@ -112,7 +112,7 @@ const Reports: React.FC = () => {
       setDailySales(dailyRes.data || {});
       setWeeklySales(weeklyRes.data || {});
       setMonthlySales(monthlyRes.data || {});
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching data:", err);
       setError("Failed to load reports data. Please try again.");
     } finally {

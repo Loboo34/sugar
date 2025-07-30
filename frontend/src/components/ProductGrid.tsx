@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { Plus, Minus, Search, Package } from "lucide-react";
 import type { Product } from "../types";
 import { useProductStore } from "../store/product.store";

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { useOrderStore } from "../store/order.store";
 import { CheckCircle, Calendar, CreditCard, Smartphone } from "lucide-react";
 
