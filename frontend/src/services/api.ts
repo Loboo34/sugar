@@ -1,7 +1,13 @@
 import axios from "axios";
-import type { Item, Order, Product, User } from "../types";
+import type { Item, Order,  User } from "../types";
 const ApiUrl = import.meta.env.VITE_API_URL;
-type Neworder = Omit<Order, "id">;
+type Neworder = {
+  products: { product: string; quantity: number }[];
+  paymentMethod: "cash" | "Mpesa";
+  user: string;
+  totalAmount: number;
+  phoneNumber?: string;
+};
 
 export const api = axios.create({
   baseURL: ApiUrl,

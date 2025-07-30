@@ -38,7 +38,7 @@ const Checkout = () => {
     try {
       const orderData = {
         products: items.map((item) => ({
-          productId: item.product.id,
+          product: item.product.id,
           quantity: item.quantity,
         })),
         paymentMethod: paymentMethod,
@@ -51,8 +51,9 @@ const Checkout = () => {
         clearCart();
         setSuccess(false);
       }, 2500);
-    } catch (error: any) {
+    } catch (error) {
       setError("Failed to process order. Please try again.");
+      console.error("Checkout error:", error);
     } finally {
       setIsProcessing(false);
     }

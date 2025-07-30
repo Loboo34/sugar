@@ -5,6 +5,13 @@ import { logger } from "../config/logger";
 import { getAccessToken } from "./token";
 import MpesaTransaction from "../models/mpesa.models";
 
+const envRequired = [
+  "PASS_KEY",
+  "BASE_URL"
+]
+
+
+
 const generateTimestamp = () => {
   return new Date().toISOString().replace(/[-:.]/g, "").slice(0, 14);
 };

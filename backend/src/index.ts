@@ -15,6 +15,22 @@ import salesRoutes from "./routes/sales.routes";
 import notificationRoutes from "./routes/notification.routes";
 import mpesaRoutes from "./routes/mpesa.routes";
 
+// Add at the start of your app
+const requiredEnvVars = [
+  'CONSUMER_KEY',
+  'CONSUMER_SECRET',
+  'PASS_KEY',
+  'BASE_URL',
+  "MONGOURI",
+  "JWT_SECRET",
+];
+
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    logger.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
 
 const app = express();
 app.use(express.json());

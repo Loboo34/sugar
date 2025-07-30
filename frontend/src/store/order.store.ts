@@ -9,7 +9,13 @@ import {
   updateOrder,
   getPaidOrders,
 } from "../services/api";
-type Neworder = Omit<Order, "id">;
+type Neworder = {
+  products: { product: string; quantity: number }[];
+  paymentMethod: "cash" | "Mpesa";
+  user: string;
+  totalAmount: number;
+  phoneNumber?: string;
+};
 interface OrderStore {
   orders: Order[];
   paidOrders: Order[];

@@ -449,11 +449,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
                           ? "M-Pesa Mobile Payment"
                           : "Cash Payment"}
                       </p>
-                      {/* <p className="text-blue-600 text-sm">
-                        {paymentMethod === "Mpesa"
-                          ? "You will receive a payment prompt on your phone"
-                          : "Payment will be collected upon delivery"}
-                      </p> */}
+                        {/* <p className="text-blue-600 text-sm">
+                          {paymentMethod === "Mpesa"
+                            ? "You will receive a payment prompt on your phone"
+                            : "Payment will be collected upon delivery"}
+                        </p> */}
                     </div>
                   </div>
                 </div>
