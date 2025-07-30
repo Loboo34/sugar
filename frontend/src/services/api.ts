@@ -158,6 +158,18 @@ export const getOrders = async () => {
     throw error;
   }
 };
+
+export const getPaidOrders = async () => {
+  try {
+    const response = await api.get("/orders/paid");
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || error.message;
+    }
+    throw error;
+  }
+};
 export const getOrder = async (id: string) => {
   try {
     const response = await api.get(`/orders/${id}`);

@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
+  // user: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  // },
   products: [
     {
       product: {
@@ -34,7 +34,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentStatus: {
     type: String,
-    enum: ["pending", "paid", "failed"],
+    enum: ["pending", "paid", "failed", "cancelled", "timeout"],
     default: "pending",
   },
   mpesaCheckoutRequestID: {
@@ -46,6 +46,9 @@ const orderSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  resultDesc: {
+    type: String,
   },
 });
 

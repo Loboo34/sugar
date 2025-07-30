@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Settings, Package, Plus, Edit2, Trash2 } from "lucide-react";
+import {
+  Settings,
+  Package,
+  Plus,
+  Edit2,
+  Trash2,
+  CheckCircle,
+} from "lucide-react";
 import { Button } from "../components/Button";
 import { useProductStore } from "../store/product.store";
 import { useInventoryStore } from "../store/inventory.store";
@@ -7,12 +14,16 @@ import AddProduct from "../components/AddProduct";
 import type { Product } from "../types";
 import AddItem from "../components/AddItem";
 import type { Item } from "../types";
+import PaidOrders from "../components/PaidOrders";
 
 export const Management = () => {
-  const [activeTab, setActiveTab] = useState<"products" | "items">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "items" | "orders">(
+    "products"
+  );
   const tabs = [
     { id: "products", label: "Products", icon: Package },
     { id: "items", label: "Items", icon: Settings },
+    { id: "orders", label: "Paid Orders", icon: CheckCircle },
   ];
   return (
     <div className="min-h-screen bg-amber-50">
@@ -52,6 +63,7 @@ export const Management = () => {
 
         {activeTab === "products" && <ProductManagement />}
         {activeTab === "items" && <ItemsManagement />}
+        {activeTab === "orders" && <PaidOrders />}
       </div>
     </div>
   );

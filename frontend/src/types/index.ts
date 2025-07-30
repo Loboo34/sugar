@@ -19,12 +19,17 @@ export interface Order {
   id: string;
   user: string;
   products: {
-    product: string;
+    product: Product;
     quantity: number;
   }[];
   totalAmount: number;
   paymentMethod: "cash" | "Mpesa";
-  phoneNumber? : string;
+  paymentStatus: "pending" | "paid" | "failed" | "cancelled" | "timeout";
+  phoneNumber?: string;
+  mpesaCheckoutRequestID?: string;
+  mpesaReceiptNumber?: string;
+  createdAt: string;
+  resultDesc?: string;
 }
 
 export interface User {

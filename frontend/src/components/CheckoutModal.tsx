@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   CreditCard,
@@ -30,16 +31,19 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuthStore();
   const userId = user?._id || user?.id;
   const [paymentStatus, setPaymentStatus] = useState<
-    "idle" | "processing" | "waiting" | "success" | "failed"
+    | "idle"
+    | "processing"
+    | "waiting"
+    | "success"
+    | "failed"
+    | "cancelled"
+    | "timeout"
   >("idle");
   const [mpesaOrderId, setMpesaOrderId] = useState<string | null>(null);
 
-  
   const formatPhoneNumber = (phone: string): string => {
-
     const digits = phone.replace(/\D/g, "");
 
-   
     if (digits.startsWith("07")) {
       return "254" + digits.substring(1);
     }
@@ -52,7 +56,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
 
     return digits;
   };
-
 
   const validatePhoneNumber = (phone: string): boolean => {
     const formatted = formatPhoneNumber(phone);
@@ -85,42 +88,24 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     let interval: number;
+    let timeoutTimer: number;
 
     if (paymentStatus === "waiting" && mpesaOrderId) {
-      interval = setInterval(async () => {
-        try {
-          
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/v1/orders/${mpesaOrderId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${getAuthToken()}`, 
-              },
-            }
-          );
-          const orderData = await response.json();
-
-          if (orderData.success && orderData.data.paymentStatus === "paid") {
-            setPaymentStatus("success");
-            setSuccess(true);
-            setTimeout(() => {
-              clearCart();
-              setSuccess(false);
-              setPaymentStatus("idle");
-              onClose();
-            }, 3000);
-          } else if (orderData.data.paymentStatus === "failed") {
-            setPaymentStatus("failed");
-            setError("Payment failed. Please try again.");
-          }
-        } catch (error) {
-          console.error("Error checking payment status:", error);
+      // Add a timeout - after 2 minutes, check if still pending
+      timeoutTimer = window.setTimeout(() => {
+        if (paymentStatus === "waiting") {
+          checkPaymentStatus(true); // Final check with timeout handling
         }
+      }, 120000); // 2 minutes
+
+      interval = setInterval(() => {
+        checkPaymentStatus(false);
       }, 3000); // Check every 3 seconds
     }
 
     return () => {
       if (interval) clearInterval(interval);
+      if (timeoutTimer) clearTimeout(timeoutTimer);
     };
   }, [paymentStatus, mpesaOrderId]);
 
@@ -134,6 +119,49 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
     return null;
   };
 
+  const checkPaymentStatus = async (isFinalCheck: boolean) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/orders/${mpesaOrderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+      const orderData = await response.json();
+
+      if (orderData.success) {
+        const status = orderData.data.paymentStatus;
+
+        if (status === "paid") {
+          setPaymentStatus("success");
+          setSuccess(true);
+          setTimeout(() => {
+            clearCart();
+            setSuccess(false);
+            setPaymentStatus("idle");
+            onClose();
+          }, 3000);
+        } else if (status === "cancelled") {
+          setPaymentStatus("cancelled");
+          setError("Payment was cancelled. Would you like to try again?");
+        } else if (
+          status === "timeout" ||
+          (isFinalCheck && status === "pending")
+        ) {
+          setPaymentStatus("timeout");
+          setError("Payment timed out. Would you like to try again?");
+        } else if (status === "failed") {
+          setPaymentStatus("failed");
+          setError("Payment failed. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking payment status:", error);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!paymentMethod) {
       setError("Please select a payment method");
@@ -145,7 +173,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
       return;
     }
 
-    
     if (paymentMethod === "Mpesa") {
       if (!phoneInput) {
         setError("Phone number is required for M-Pesa payment");
@@ -180,7 +207,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
       if (paymentMethod === "Mpesa") {
         // For M-Pesa, wait for payment confirmation
         setPaymentStatus("waiting");
-      setMpesaOrderId(response?.id || response?._id);
+        setMpesaOrderId(response?.data?._id || null);
         setIsProcessing(false);
       } else {
         // For cash, complete immediately
@@ -203,8 +230,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
@@ -216,7 +243,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden animate-slideUp">
+      <div
+        className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden animate-slideUp"
+        style={{ zIndex: 10000 }}
+      >
         {/* M-Pesa Waiting State */}
         {paymentStatus === "waiting" ? (
           <div className="p-8 text-center">
@@ -226,10 +256,10 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
               Waiting for M-Pesa Payment
             </h3>
-            <p className="text-gray-600 text-lg mb-6">
+            {/* <p className="text-gray-600 text-lg mb-6">
               Please check your phone for the M-Pesa prompt and complete the
               payment
-            </p>
+            </p> */}
 
             {/* Phone number display */}
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6 mx-auto max-w-sm">
@@ -271,14 +301,56 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
             <Button
               variant="outline"
               onClick={() => {
-                setPaymentStatus("idle");
-                setMpesaOrderId(null);
-                onClose();
+                setPaymentStatus("cancelled");
+                setError("Payment cancelled. Would you like to try again?");
               }}
               className="px-8 py-3 text-lg font-semibold border-2 border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl"
             >
-              Cancel & Close
+              Cancel Payment
             </Button>
+          </div>
+        ) : paymentStatus === "cancelled" ||
+          paymentStatus === "timeout" ||
+          paymentStatus === "failed" ? (
+          // Cancelled/Timeout/Failed State
+          <div className="p-8 text-center">
+            <div className="mx-auto flex items-center justify-center w-24 h-24 bg-orange-100 rounded-2xl mb-6">
+              <AlertCircle className="w-12 h-12 text-orange-600" />
+            </div>
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              {paymentStatus === "cancelled"
+                ? "Payment Cancelled"
+                : paymentStatus === "timeout"
+                ? "Payment Timed Out"
+                : "Payment Failed"}
+            </h3>
+            <p className="text-gray-600 text-lg mb-6">
+              {error ||
+                "There was an issue with your payment. Would you like to try again?"}
+            </p>
+
+            <div className="flex gap-4 justify-center">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose();
+                }}
+                className="px-8 py-3 text-lg font-semibold border-2 border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  setPaymentStatus("idle");
+                  setError(null);
+                  setPhoneError(null);
+                  // Keep the phone number for convenience
+                }}
+                className="px-8 py-3 text-lg font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl"
+              >
+                Try Again
+              </Button>
+            </div>
           </div>
         ) : success || paymentStatus === "success" ? (
           // Success State
@@ -377,11 +449,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
                           ? "M-Pesa Mobile Payment"
                           : "Cash Payment"}
                       </p>
-                      <p className="text-blue-600 text-sm">
+                      {/* <p className="text-blue-600 text-sm">
                         {paymentMethod === "Mpesa"
                           ? "You will receive a payment prompt on your phone"
                           : "Payment will be collected upon delivery"}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                 </div>
@@ -502,7 +574,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

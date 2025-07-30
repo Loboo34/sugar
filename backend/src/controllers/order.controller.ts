@@ -7,7 +7,7 @@ import { mpesaController } from "../services/mpesaController";
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
     const orders = await Order.find()
-      .populate("user")
+      //.populate("user")
       .populate("products.product");
     res.status(200).json({
       success: true,
@@ -26,7 +26,7 @@ export const getOrder = async (req: Request, res: Response) => {
   const orderId = req.params.id;
   try {
     const order = await Order.findById(orderId)
-      .populate("user")
+      //.populate("user")
       .populate("products.product");
     if (!order) {
       res.status(404).json({
@@ -108,20 +108,21 @@ export const createOrder = async (req: Request, res: Response) => {
       totalAmount,
       paymentMethod,
       paymentStatus: paymentMethod === "cash" ? "paid" : "pending",
+      phoneNumber: paymentMethod === "Mpesa" ? phoneNumber : undefined,
     });
     const savedOrder = await newOrder.save();
 
-   if (
-     paymentMethod === "Mpesa" &&
-     (!phoneNumber || !/^2547\d{8}$/.test(phoneNumber))
-   ) {
-     logger.warn("Invalid phone number for Mpesa payment");
-     return res.status(400).json({
-       success: false,
-       message:
-         "A valid phone number (format: 2547XXXXXXXX) is required for Mpesa payment",
-     });
-   }
+    if (
+      paymentMethod === "Mpesa" &&
+      (!phoneNumber || !/^2547\d{8}$/.test(phoneNumber))
+    ) {
+      logger.warn("Invalid phone number for Mpesa payment");
+      return res.status(400).json({
+        success: false,
+        message:
+          "A valid phone number (format: 2547XXXXXXXX) is required for Mpesa payment",
+      });
+    }
     if (paymentMethod === "Mpesa") {
       try {
         const mpesa = await mpesaController.initiatePayment({
@@ -178,6 +179,26 @@ export const updateOrder = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     logger.error(`Error updating order: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getPaidOrders = async (req: Request, res: Response) => {
+  try {
+    const paidOrders = await Order.find({ paymentStatus: "paid" })
+      .populate("products.product")
+      .sort({ createdAt: -1 }); 
+
+    res.status(200).json({
+      success: true,
+      data: paidOrders,
+      count: paidOrders.length,
+    });
+  } catch (error: any) {
+    logger.error(`Error fetching paid orders: ${error.message}`);
     res.status(500).json({
       success: false,
       message: "Internal server error",

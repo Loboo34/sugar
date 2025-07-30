@@ -20,7 +20,6 @@ const ProductGrid = () => {
     "cookies",
   ];
 
-
   const getCartQuantity = (productId: string): number => {
     const cartItem = items.find((item) => item.product.id === productId);
     return cartItem ? cartItem.quantity : 0;
@@ -47,13 +46,11 @@ const ProductGrid = () => {
     setFilteredProducts(filtered);
   }, [searchCategory, searchTerm, products]);
 
-
   const handleAddToCart = (product: Product, quantityChange: number) => {
     if (quantityChange <= 0) return;
 
     const currentCartQuantity = getCartQuantity(product.id);
     const newCartQuantity = currentCartQuantity + quantityChange;
-
 
     if (newCartQuantity > product.stock) {
       alert(`Only ${product.stock} items available in stock`);
@@ -67,7 +64,6 @@ const ProductGrid = () => {
     };
     addToCart(cartItem);
   };
-
 
   const handleQuickAdd = (product: Product) => {
     handleAddToCart(product, 1);
@@ -126,7 +122,6 @@ const ProductGrid = () => {
           ) : null}
         </div>
 
-       
         <div className="text-lg text-amber-700">
           {searchCategory !== "all" && (
             <span className="bg-amber-200 px-4 py-2 rounded-full">
@@ -160,10 +155,9 @@ const ProductGrid = () => {
                       alt={product.name}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
-                    
+
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-               
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <h3 className="font-bold text-lg text-white mb-1 leading-tight drop-shadow-lg">
                         {product.name}
@@ -187,7 +181,7 @@ const ProductGrid = () => {
 
                 {/* Cart Quantity Badge */}
                 {cartQuantity > 0 && (
-                  <div className="absolute -top-2 -right-2 z-10">
+                  <div className="absolute -top-2 -right-2 z-1">
                     <div className="bg-amber-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg border-2 border-white">
                       <span className="text-sm font-bold">{cartQuantity}</span>
                     </div>
@@ -195,7 +189,7 @@ const ProductGrid = () => {
                 )}
 
                 {/* Stock Status Badge */}
-                <div className="absolute top-2 left-2 z-10">
+                <div className="absolute top-2 left-2 z-1">
                   <div
                     className={`px-2 py-1 rounded-full text-xs font-semibold shadow-md backdrop-blur-sm ${
                       product.stock > 10

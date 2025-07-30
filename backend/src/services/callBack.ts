@@ -16,10 +16,10 @@ export const callBack = async (req: Request, res: Response) => {
 
     const body = req.body;
 
-    // Check if body exists and has data
+    
     if (!body || Object.keys(body).length === 0) {
       logger.error("Empty callback body received");
-      // Still save a record for debugging
+     
       const transaction = new MpesaTransaction({
         amount: 0,
         phoneNumber: "Unknown",
@@ -46,6 +46,20 @@ export const callBack = async (req: Request, res: Response) => {
     }
 
     const resultCode = stkCallback.ResultCode;
+    let resultStatus: "pending" | "paid" | "failed" | "cancelled" | "timeout" =
+      "failed";
+
+   
+    if (resultCode === 0) {
+      resultStatus = "paid";
+    } else if (resultCode === 1032) {
+      resultStatus = "cancelled";
+    } else if (resultCode === 1037) {
+      resultStatus = "timeout"; 
+    } else {
+      resultStatus = "failed"; 
+    }
+
     const resultDesc = stkCallback.ResultDesc;
     const checkoutRequestId = stkCallback.CheckoutRequestID;
     const merchantRequestId = stkCallback.MerchantRequestID;
@@ -55,7 +69,7 @@ export const callBack = async (req: Request, res: Response) => {
     let mpesaReceiptNumber = "";
     let transactionDate = "";
 
-    // Extract data from successful transactions
+ 
     if (resultCode === 0 && stkCallback.CallbackMetadata) {
       const items = stkCallback.CallbackMetadata.Item;
       logger.info("CallbackMetadata items:", items);
@@ -88,7 +102,7 @@ export const callBack = async (req: Request, res: Response) => {
       amount: amount,
       phoneNumber: phoneNumber,
       name: mpesaReceiptNumber || "Unknown",
-      status: resultCode === 0 ? "success" : "failed",
+      status: resultCode === 0 ? "success" : "failed", 
       mpesaReceiptNumber: mpesaReceiptNumber,
       checkoutRequestId: checkoutRequestId,
       merchantRequestId: merchantRequestId,
@@ -113,9 +127,24 @@ export const callBack = async (req: Request, res: Response) => {
 
     const order = await Order.findOne(query.length ? { $or: query } : {});
     if (order) {
-      order.paymentStatus = resultCode === 0 ? "paid" : "failed";
-      order.mpesaReceiptNumber = mpesaReceiptNumber;
+    
+      if (resultCode === 0) {
+        order.paymentStatus = "paid";
+      } else if (resultCode === 1032) {
+        order.paymentStatus = "failed"; 
+      } else if (resultCode === 1037) {
+        order.paymentStatus = "failed"; 
+      } else {
+        order.paymentStatus = "failed";
+      }
+
+      order.mpesaReceiptNumber = mpesaReceiptNumber || "";
+      order.resultDesc = resultDesc; 
       await order.save();
+
+      transaction.products = order.products;
+      transaction.order = order._id;
+      await transaction.save();
     }
 
     res.status(200).json({ message: "Callback processed successfully" });

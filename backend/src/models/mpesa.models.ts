@@ -9,9 +9,22 @@ const mpesaSchema = new mongoose.Schema({
     enum: ["pending", "success", "failed"],
     default: "pending",
   },
-  products: {
-    type: mongoose.schema.Types.ObjectId,
-    ref: "Product"
+  products: [
+    {product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product"
+    },
+  quantity: {
+    type: Number,
+    default: 1,
+  },
+price: {
+  type: Number,
+}}
+  ],
+  order: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Order"
   },
   mpesaReceiptNumber: { type: String },
   checkoutRequestId: { type: String },
