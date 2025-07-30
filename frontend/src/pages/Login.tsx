@@ -7,7 +7,7 @@ import { useAuthStore } from "../store/auth.store";
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {login, isLoading, error} = useAuthStore()
+    const {login, isLoading} = useAuthStore()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,11 +70,11 @@ const Login = () => {
               </div>
             </div>
 
-            {error && (
+            {/* {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
-            )}
+            )} */}
 
             <Button
               type="submit"
