@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const mpesaController_1 = require("../services/mpesaController");
+const callBack_1 = require("../services/callBack");
+const router = (0, express_1.Router)();
+//router.post("/lipanampesa", mpesaController.initiatePayment);
+router.post("/callback", callBack_1.callBack);
+router.get("/transactions", mpesaController_1.mpesaController.getTransactions);
+exports.default = router;
