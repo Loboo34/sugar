@@ -224,14 +224,14 @@ const Cart = () => {
               {/* Total - Bigger and Cleaner */}
               <div className="border-t border-gray-200 pt-6">
                 <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-gray-600 text-lg">
+                  {/* <div className="flex justify-between text-gray-600 text-lg">
                     <span>Subtotal ({items.length} items)</span>
-                    <span>${totalAmount.toFixed(2)}</span>
-                  </div>
+                    <span>ksh{totalAmount.toFixed(2)}</span>
+                  </div> */}
                   <div className="flex justify-between items-center text-2xl font-bold text-gray-900">
                     <span>Total Amount</span>
                     <span className="text-amber-600">
-                      ${totalAmount.toFixed(2)}
+                      Ksh{totalAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>

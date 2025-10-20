@@ -224,7 +224,7 @@ const ProductGrid = () => {
                 <div className="mb-4">
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-gray-900">
-                      ${product.price.toFixed(2)}
+                      Ksh{product.price.toFixed(2)}
                     </span>
                     <span className="text-gray-500 text-sm">each</span>
                   </div>
