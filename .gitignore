@@ -1,0 +1,82 @@
+# ==============================================================================
+# Root .gitignore for Golden Crust Bakery (sugar monorepo)
+# ==============================================================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# Production & Build Artifacts
+dist/
+**/dist/
+build/
+**/build/
+dist-ssr/
+**/dist-ssr/
+/public/build
+.output/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.env.local
+
+# Logs & Debugging
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data & PIDs
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Test Coverage
+coverage/
+**/coverage/
+*.lcov
+.nyc_output
+
+# TypeScript & Cache
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# IDE, Editors & System
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.sw?
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Temporary Files
+tmp/
+**/tmp/
+temp/
+**/temp/
